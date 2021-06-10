@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.function.Function;
+
 import core.*;
 
 /**
@@ -13,9 +15,20 @@ import core.*;
  */
 public class Interpreter {
     HashMap<String, Atom> globals;
+    HashMap<String, ProgramFunction> program; // Built in system functions
 
     public Interpreter() throws Exception {
         globals = new HashMap<>();
+        program = new HashMap<>();
+
+        program.put("print", (expressions) -> {
+            for (int i = 0; i < expressions.size(); i++) {
+                System.out.print(expressions.get(i).eval(globals, program).toString());
+                if (i < expressions.size() - 1) System.out.print(' ');
+            }
+            System.out.print('\n');
+            return new Atom.Unit();
+        });
 
         // small standard library
         execute("let range = fn(a, b) => if (a == b - 1) then ([a]) else ([a] + range(a + 1, b))");
@@ -28,7 +41,7 @@ public class Interpreter {
     }
 
     public Atom eval(String expr) throws Exception {
-        return Parser.parseExpr(expr).eval(globals);
+        return Parser.parseExpr(expr).eval(globals, program);
     }
 
     public void execute(String expr) throws Exception {
@@ -52,7 +65,7 @@ public class Interpreter {
 
         ArrayList<Atom> results = new ArrayList<>();
         for (Expr e : expressions) {
-            results.add(e.eval(globals));
+            results.add(e.eval(globals, program));
         }
         return results;
     }

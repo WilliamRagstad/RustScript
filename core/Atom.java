@@ -223,10 +223,10 @@ public abstract class Atom {
         }
     }
 
-    public Atom head(HashMap<String, Atom> variables) throws Exception {
+    public Atom head(HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
         if (this instanceof List) {
             List ls = (List) this;
-            return (Atom) ls.list.get(0).eval(variables);
+            return (Atom) ls.list.get(0).eval(variables, program);
         } else {
             throw new Exception("Bad Head");
         }

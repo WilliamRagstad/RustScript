@@ -16,7 +16,7 @@ import java.util.HashMap;
  */
 public abstract class Expr {
     public int startIndex, endIndex;
-    public abstract Atom eval(HashMap<String, Atom> variables) throws Exception;
+    public abstract Atom eval(HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception;
 
     public Expr(int startIndex, int endIndex) {
         this.startIndex = startIndex;
@@ -26,7 +26,7 @@ public abstract class Expr {
     public static class AtomicExpr extends Expr {
         Atom val;
 
-        public Atom eval(HashMap<String, Atom> variables) throws Exception {
+        public Atom eval(HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
             if (val instanceof Atom.Ident) {
                 Atom.Ident v = (Atom.Ident) val;
                 var res = variables.get(v.name);
@@ -38,7 +38,7 @@ public abstract class Expr {
                 Atom.List ls = (Atom.List) val;
                 ArrayList<Expr> nls = new ArrayList<>();
                 for (Expr expr : ls.list) {
-                    nls.add(new AtomicExpr(expr.eval(variables)));
+                    nls.add(new AtomicExpr(expr.eval(variables, program)));
                 }
                 return new Atom.List(nls);
             } else {
@@ -65,11 +65,11 @@ public abstract class Expr {
         PrefixOp op;
         Expr rhs;
 
-        public Atom eval(HashMap<String, Atom> variables) throws Exception {
+        public Atom eval(HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
             return switch (op) {
-                case Negate -> rhs.eval(variables).negate();
-                case Head -> rhs.eval(variables).head(variables);
-                case Tail -> rhs.eval(variables).tail(variables);
+                case Negate -> rhs.eval(variables, program).negate();
+                case Head -> rhs.eval(variables, program).head(variables, program);
+                case Tail -> rhs.eval(variables, program).tail(variables);
             };
         }
 
@@ -95,18 +95,18 @@ public abstract class Expr {
         Expr lhs;
         Expr rhs;
 
-        public Atom eval(HashMap<String, Atom> variables) throws Exception {
+        public Atom eval(HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
             return switch (op) {
-                case Add -> lhs.eval(variables).add(rhs.eval(variables));
-                case Sub -> lhs.eval(variables).sub(rhs.eval(variables));
-                case Mul -> lhs.eval(variables).mul(rhs.eval(variables));
-                case Div -> lhs.eval(variables).div(rhs.eval(variables));
-                case Mod -> lhs.eval(variables).mod(rhs.eval(variables));
-                case LT -> lhs.eval(variables).lt(rhs.eval(variables));
-                case GT -> lhs.eval(variables).gt(rhs.eval(variables));
-                case EQ -> lhs.eval(variables).eq(rhs.eval(variables));
-                case And -> lhs.eval(variables).and(rhs.eval(variables));
-                case Or -> lhs.eval(variables).or(rhs.eval(variables));
+                case Add -> lhs.eval(variables, program).add(rhs.eval(variables, program));
+                case Sub -> lhs.eval(variables, program).sub(rhs.eval(variables, program));
+                case Mul -> lhs.eval(variables, program).mul(rhs.eval(variables, program));
+                case Div -> lhs.eval(variables, program).div(rhs.eval(variables, program));
+                case Mod -> lhs.eval(variables, program).mod(rhs.eval(variables, program));
+                case LT -> lhs.eval(variables, program).lt(rhs.eval(variables, program));
+                case GT -> lhs.eval(variables, program).gt(rhs.eval(variables, program));
+                case EQ -> lhs.eval(variables, program).eq(rhs.eval(variables, program));
+                case And -> lhs.eval(variables, program).and(rhs.eval(variables, program));
+                case Or -> lhs.eval(variables, program).or(rhs.eval(variables, program));
             };
         }
 
@@ -146,12 +146,12 @@ public abstract class Expr {
         Expr lhs;
         Expr rhs;
 
-        public Atom eval(HashMap<String, Atom> variables) throws Exception {
-            Atom condVal = cond.eval(variables);
+        public Atom eval(HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
+            Atom condVal = cond.eval(variables, program);
             if (condVal.isTruthy()) {
-                return lhs.eval(variables);
+                return lhs.eval(variables, program);
             } else {
-                return rhs.eval(variables);
+                return rhs.eval(variables, program);
             }
         }
 
@@ -178,15 +178,18 @@ public abstract class Expr {
         String name;
         ArrayList<Expr> variables;
 
-        public Atom eval(HashMap<String, Atom> variables) throws Exception {
+        public Atom eval(HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
             HashMap<String, Atom> evaledVariables = new HashMap<>();
             evaledVariables.putAll(variables);
 
             Atom.Lambda lambda = ((Atom.Lambda) evaledVariables.get(this.name));
-            if (lambda == null) {
-                throw new Exception(String.format("Undefined lambda '%s'", this.name));
-            }
+            if (lambda != null) return evalLambda(lambda, evaledVariables, variables, program);
+            ProgramFunction pf = program.get(this.name);
+            if (pf != null) return pf.call(this.variables);
+            throw new Exception(String.format("Undefined function '%s'", this.name));
+        }
 
+        public Atom evalLambda(Atom.Lambda lambda, HashMap<String, Atom> evaledVariables, HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
             ArrayList<String> argNames = lambda.argNames;
 
             if (this.variables.size() != lambda.argNames.size()) {
@@ -195,11 +198,10 @@ public abstract class Expr {
             }
 
             for (int i = 0; i < argNames.size(); i += 1) {
-                evaledVariables.put(argNames.get(i), this.variables.get(i).eval(variables));
+                evaledVariables.put(argNames.get(i), this.variables.get(i).eval(variables, program));
             }
 
-            Expr expr = lambda.expr;
-            return expr.eval(evaledVariables);
+            return lambda.expr.eval(evaledVariables, program);
         }
 
         public LambdaCall(String name, int startIndex, int endIndex) {
@@ -233,8 +235,8 @@ public abstract class Expr {
         String lhs;
         Expr rhs;
 
-        public Atom eval(HashMap<String, Atom> variables) throws Exception {
-            variables.put(lhs, rhs.eval(variables));
+        public Atom eval(HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
+            variables.put(lhs, rhs.eval(variables, program));
             return new Atom.Unit();
         }
 
@@ -261,28 +263,29 @@ public abstract class Expr {
         // individually
 
         HashMap<String, Atom> emptyScope = new HashMap<>();
+        HashMap<String, ProgramFunction> emptyProgram = new HashMap<>();
 
         AtomicExpr e1 = new AtomicExpr(new Atom.Val(1));
-        assert ((Atom.Val) e1.eval(emptyScope)).val == 1;
+        assert ((Atom.Val) e1.eval(emptyScope, emptyProgram)).val == 1;
 
         HashMap<String, Atom> piScope = new HashMap<>();
         piScope.put("pi", new Atom.Val(3));
         AtomicExpr e2 = new AtomicExpr(new Atom.Ident("pi"));
-        assert ((Atom.Val) e2.eval(piScope)).val == 3;
+        assert ((Atom.Val) e2.eval(piScope, emptyProgram)).val == 3;
 
         PrefixExpr e3 = new PrefixExpr(PrefixOp.Negate, new AtomicExpr(new Atom.Val(3)));
-        assert ((Atom.Val) e3.eval(emptyScope)).val == -3;
+        assert ((Atom.Val) e3.eval(emptyScope, emptyProgram)).val == -3;
 
         BinaryExpr e4 = new BinaryExpr(BinOp.Add, new Atom.Val(10), new Atom.Val(20));
-        assert ((Atom.Val) e4.eval(emptyScope)).val == 30;
+        assert ((Atom.Val) e4.eval(emptyScope, emptyProgram)).val == 30;
 
         IfExpr e5 = new IfExpr(new AtomicExpr(new Atom.Bool(false)), new AtomicExpr(new Atom.Val(10)),
                 new AtomicExpr(new Atom.Val(20)));
-        assert ((Atom.Val) e5.eval(emptyScope)).val == 20;
+        assert ((Atom.Val) e5.eval(emptyScope, emptyProgram)).val == 20;
 
         IfExpr e6 = new IfExpr(new AtomicExpr(new Atom.Bool(true)), new AtomicExpr(new Atom.Val(10)),
                 new AtomicExpr(new Atom.Val(20)));
-        assert ((Atom.Val) e6.eval(emptyScope)).val == 10;
+        assert ((Atom.Val) e6.eval(emptyScope, emptyProgram)).val == 10;
 
         HashMap<String, Atom> lambdaScope = new HashMap<>();
 
@@ -294,16 +297,16 @@ public abstract class Expr {
 
         LambdaCall e7 = (LambdaCall) Parser.parseExpr("fib(10)");
         LambdaCall e8 = (LambdaCall) Parser.parseExpr("add(5, 10)");
-        assert ((Atom.Val) e7.eval(lambdaScope)).val == 89;
-        assert ((Atom.Val) e8.eval(lambdaScope)).val == 15;
+        assert ((Atom.Val) e7.eval(lambdaScope, emptyProgram)).val == 89;
+        assert ((Atom.Val) e8.eval(lambdaScope, emptyProgram)).val == 15;
 
         HashMap<String, Atom> newScope = new HashMap<>();
 
         AssignExpr e9 = (AssignExpr) Parser.parseExpr("let x = 15");
-        e9.eval(newScope);
+        e9.eval(newScope, emptyProgram);
         assert ((Atom.Val) newScope.get("x")).val == 15;
         AssignExpr e10 = (AssignExpr) Parser.parseExpr("let x = x * x");
-        e10.eval(newScope);
+        e10.eval(newScope, emptyProgram);
         assert ((Atom.Val) newScope.get("x")).val == 15 * 15;
     }
 }
