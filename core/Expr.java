@@ -1,3 +1,4 @@
+package core;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -15,7 +16,7 @@ import java.util.HashMap;
  */
 public abstract class Expr {
     public int startIndex, endIndex;
-    abstract Atom eval(HashMap<String, Atom> variables) throws Exception;
+    public abstract Atom eval(HashMap<String, Atom> variables) throws Exception;
 
     public Expr(int startIndex, int endIndex) {
         this.startIndex = startIndex;
@@ -25,7 +26,7 @@ public abstract class Expr {
     public static class AtomicExpr extends Expr {
         Atom val;
 
-        Atom eval(HashMap<String, Atom> variables) throws Exception {
+        public Atom eval(HashMap<String, Atom> variables) throws Exception {
             if (val instanceof Atom.Ident) {
                 Atom.Ident v = (Atom.Ident) val;
                 var res = variables.get(v.name);
@@ -64,7 +65,7 @@ public abstract class Expr {
         PrefixOp op;
         Expr rhs;
 
-        Atom eval(HashMap<String, Atom> variables) throws Exception {
+        public Atom eval(HashMap<String, Atom> variables) throws Exception {
             return switch (op) {
                 case Negate -> rhs.eval(variables).negate();
                 case Head -> rhs.eval(variables).head(variables);
@@ -94,7 +95,7 @@ public abstract class Expr {
         Expr lhs;
         Expr rhs;
 
-        Atom eval(HashMap<String, Atom> variables) throws Exception {
+        public Atom eval(HashMap<String, Atom> variables) throws Exception {
             return switch (op) {
                 case Add -> lhs.eval(variables).add(rhs.eval(variables));
                 case Sub -> lhs.eval(variables).sub(rhs.eval(variables));
@@ -145,7 +146,7 @@ public abstract class Expr {
         Expr lhs;
         Expr rhs;
 
-        Atom eval(HashMap<String, Atom> variables) throws Exception {
+        public Atom eval(HashMap<String, Atom> variables) throws Exception {
             Atom condVal = cond.eval(variables);
             if (condVal.isTruthy()) {
                 return lhs.eval(variables);
@@ -177,7 +178,7 @@ public abstract class Expr {
         String name;
         ArrayList<Expr> variables;
 
-        Atom eval(HashMap<String, Atom> variables) throws Exception {
+        public Atom eval(HashMap<String, Atom> variables) throws Exception {
             HashMap<String, Atom> evaledVariables = new HashMap<>();
             evaledVariables.putAll(variables);
 
@@ -232,7 +233,7 @@ public abstract class Expr {
         String lhs;
         Expr rhs;
 
-        Atom eval(HashMap<String, Atom> variables) throws Exception {
+        public Atom eval(HashMap<String, Atom> variables) throws Exception {
             variables.put(lhs, rhs.eval(variables));
             return new Atom.Unit();
         }

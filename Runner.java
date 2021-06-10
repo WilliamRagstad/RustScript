@@ -4,7 +4,7 @@ import java.util.Scanner;
 import java.io.IOException;
 
 /**
- * @author C. William Rågstad <william.ragstad@gmail.com>
+ * @author William Rågstad <william.ragstad@gmail.com>
  * @version 0.1.0
  * 
  *          The Runner takes a set of input source code files as command

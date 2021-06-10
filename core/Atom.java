@@ -1,3 +1,4 @@
+package core;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -18,7 +19,7 @@ import java.util.HashMap;
  */
 public abstract class Atom {
     public static class Val extends Atom {
-        int val;
+        public int val;
 
         public Val(int val) {
             this.val = val;
@@ -30,7 +31,7 @@ public abstract class Atom {
     }
 
     public static class Bool extends Atom {
-        boolean val;
+        public boolean val;
 
         public Bool(boolean val) {
             this.val = val;
@@ -42,7 +43,7 @@ public abstract class Atom {
     }
     
     public static class Char extends Atom {
-    	char val;
+    	public char val;
     	
     	public Char(char val) {
             this.val = val;
@@ -54,7 +55,7 @@ public abstract class Atom {
     }
 
     public static class List extends Atom {
-        ArrayList<Expr> list;
+        public ArrayList<Expr> list;
 
         public List(ArrayList<Expr> list) {
             this.list = list;
@@ -97,7 +98,7 @@ public abstract class Atom {
     }
 
     public static class Ident extends Atom {
-        String name;
+        public String name;
 
         public Ident(String name) {
             this.name = name;
@@ -109,8 +110,8 @@ public abstract class Atom {
     }
 
     public static class Lambda extends Atom {
-        Expr expr;
-        ArrayList<String> argNames;
+        public Expr expr;
+        public ArrayList<String> argNames;
 
         public Lambda(Expr expr, ArrayList<String> argNames) {
             this.expr = expr;

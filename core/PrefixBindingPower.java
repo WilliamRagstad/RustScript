@@ -1,3 +1,4 @@
+package core;
 public class PrefixBindingPower {
     public int right;
 

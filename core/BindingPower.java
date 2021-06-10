@@ -1,3 +1,5 @@
+package core;
+
 public class BindingPower {
     public int left;
     public int right;

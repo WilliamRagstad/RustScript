@@ -1,4 +1,4 @@
-
+package core;
 /**
  * @author Mikail Khan <mikail@mikail-khan.com>
  * @version 0.1.0
