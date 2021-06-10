@@ -10,7 +10,7 @@ public class Repl {
             try {
                 System.out.print("> ");
                 String expr = sc.nextLine();
-                i.execute(expr);
+                i.executeAll(expr);
             } catch (java.util.NoSuchElementException e) {
                 sc.close();
                 break;
