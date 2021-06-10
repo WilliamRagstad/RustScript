@@ -51,31 +51,35 @@ public class Interpreter {
         }
     }
     
-    public ArrayList<Atom> evalAll(String expr) throws Exception {
-        ArrayList<Expr> expressions = new ArrayList<>();
-        Expr tmp;
-        while(true) {
-            expr = expr.trim();
-            if (expr.equals("")) break;
-            tmp = Parser.parseExpr(expr);
-            expressions.add(tmp);
-            if (tmp.endIndex == -1) break;
-            expr = expr.substring(tmp.endIndex);
-        }
+    // public ArrayList<Atom> evalAll(String expr) throws Exception {
+    //     ArrayList<Expr> expressions = new ArrayList<>();
+    //     Expr tmp;
+    //     while(true) {
+    //         expr = expr.trim();
+    //         if (expr.equals("")) break;
+    //         tmp = Parser.parseExpr(expr);
+    //         expressions.add(tmp);
+    //         if (tmp.endIndex == -1) break;
+    //         expr = expr.substring(tmp.endIndex);
+    //     }
 
-        ArrayList<Atom> results = new ArrayList<>();
-        for (Expr e : expressions) {
-            results.add(e.eval(globals, program));
-        }
-        return results;
-    }
+    //     ArrayList<Atom> results = new ArrayList<>();
+    //     for (Expr e : expressions) {
+    //         results.add(e.eval(globals, program));
+    //     }
+    //     return results;
+    // }
 
-    public void executeAll(String expr) throws Exception {
-        ArrayList<Atom> res = evalAll(expr);
-        for (Atom r : res) {
-            if (!(r instanceof Atom.Unit)) {
-                System.out.println(r.toString());
-            }
+    /**
+     * This method evaluates all expressions and returns the last expressions value.
+     * Can be used for closures and running script files (and discarding the returned result).
+     * @param exprs Expressions to evaluate
+     * @throws Exception
+     */
+    public Atom evalAll(String[] exprs) throws Exception {
+        for (int i = 0; i < exprs.length; i++) {
+            if (i == exprs.length - 1) return eval(expr); // Return if last, this is to skip overwriting a temp var.
+            eval(expr); // Otherwise don't return the result
         }
     }
 }

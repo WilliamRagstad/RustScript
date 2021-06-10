@@ -166,12 +166,6 @@ public class Tokenizer {
     private void addNextToken() throws Exception {
         char c = eat();
         switch (c) {
-            case ' ' -> addNextToken();
-            case '\n' -> {
-                addToken(TokenTy.ExprSeparator, c);
-                while (peek() == '\r' || peek() == '\n') eat();
-            }
-            case ';' -> addToken(TokenTy.ExprSeparator, c);
             case '(' -> addToken(TokenTy.LParen, c);
             case ')' -> addToken(TokenTy.RParen, c);
             case '[' -> addToken(TokenTy.LBracket, c);
@@ -217,7 +211,8 @@ public class Tokenizer {
                 }
             }
             default -> {
-                if (Character.isAlphabetic(c)) {
+                if (Character.isWhitespace(c)) addNextToken();
+                else if (Character.isAlphabetic(c)) {
                     position -= 1;
                     scanIdent();
                 } else if (Character.isDigit(c)) {

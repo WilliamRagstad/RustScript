@@ -59,5 +59,5 @@ enum TokenTy {
 
     For, In, DotDot,
 
-    EOF, ExprSeparator
+    EOF
 }

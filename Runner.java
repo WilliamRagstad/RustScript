@@ -19,9 +19,9 @@ public class Runner {
         Scanner sc = new Scanner(System.in);
 
         for (String file : args) {
-            String source = "";
+            String[] source;
             try {
-                source = Files.readString(Paths.get(file));
+                source = Files.readString(Paths.get(file)).split('\n');
             } catch (IOException e) {
                 e.printStackTrace();
                 continue;
@@ -29,7 +29,7 @@ public class Runner {
 
             i = new Interpreter(); // New environment for each file.
             try {
-                i.executeAll(source);
+                i.evalAll(source);
             }  catch (Exception e) {
                 System.out.println(e.getMessage());
             }
