@@ -36,6 +36,7 @@ public class Interpreter {
     }
 
     private void loadProgram() {
+        // Helper functions
         Function2<ArrayList<Expr>, Character, Atom> printFunc = (expressions, suffix) -> {
             for (int i = 0; i < expressions.size(); i++) {
                 Atom val = expressions.get(i).eval(globals, program);
@@ -47,10 +48,14 @@ public class Interpreter {
             if (suffix != null) System.out.print(suffix);
             return new Atom.Unit();
         };
+        Consumer2<ArrayList<Expr>, Integer> expect = (args, n) -> {
+            if (args.size() != n) throw new Exception(String.format("Expected %d argument to call of function input, got %d", n, args.size()));
+        };
+        // Program built-ins
         program.put("print", (expressions) -> printFunc.apply(expressions, null));
         program.put("println", (expressions) -> printFunc.apply(expressions, '\n'));
         program.put("input", (expressions) -> {
-            if (expressions.size() != 1) throw new Exception("Expected 1 argument to call of function input, got " + expressions.size());
+            expect.apply(expressions, 1);
             Atom textAtom = expressions.get(0).eval(globals, program);
             if (!(textAtom instanceof Atom.Str || textAtom instanceof Atom.Char)) throw new Exception(String.format("Can't coerce %s to a string or char", textAtom.toString()));
             String textVal = null;
@@ -61,7 +66,10 @@ public class Interpreter {
             String inputVal = in.nextLine();
             return new Atom.Str(inputVal);
         });
-        
+        program.put("typeof", (expressions) -> {
+            expect.apply(expressions, 1);
+            return new Atom.Str(expressions.get(0).eval(globals, program).getClass().getSimpleName());
+        });
     }
 
     public Atom eval(String expr) throws Exception {
@@ -114,4 +122,8 @@ public class Interpreter {
 @FunctionalInterface
 interface Function2<One, Two, Return> {
     public Return apply(One one, Two two) throws Exception;
+}
+@FunctionalInterface
+interface Consumer2<One, Two> {
+    public void apply(One one, Two two) throws Exception;
 }
