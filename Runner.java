@@ -14,7 +14,11 @@ import java.io.IOException;
  */
 public class Runner {
     public static void main(String[] args) throws Exception {
-        args = new String[] { "test\\input1.rs" };
+        // args = new String[] { "test\\input1.rs" };
+        if (args.length == 0) {
+            System.out.println("Usage: Runner [file(s)]");
+            return;
+        }
         Interpreter i;
         for (String file : args) {
             String[] source;
