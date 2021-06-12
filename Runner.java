@@ -14,26 +14,22 @@ import java.io.IOException;
  */
 public class Runner {
     public static void main(String[] args) throws Exception {
+        args = new String[] { "test\\input1.rs" };
         Interpreter i;
-
-        Scanner sc = new Scanner(System.in);
-
         for (String file : args) {
             String[] source;
             try {
-                source = Files.readString(Paths.get(file)).split('\n');
+                source = Files.readString(Paths.get(file)).split("\n");
             } catch (IOException e) {
                 e.printStackTrace();
                 continue;
             }
-
             i = new Interpreter(); // New environment for each file.
             try {
-                i.evalAll(source);
+                i.evalAll(source); // Discard last the expressions value
             }  catch (Exception e) {
                 System.out.println(e.getMessage());
             }
-            i.executeAll(source);
         }
     }
 }

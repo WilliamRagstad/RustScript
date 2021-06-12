@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
 import java.util.function.Function;
 
 import core.*;
@@ -21,14 +22,8 @@ public class Interpreter {
         globals = new HashMap<>();
         program = new HashMap<>();
 
-        program.put("print", (expressions) -> {
-            for (int i = 0; i < expressions.size(); i++) {
-                System.out.print(expressions.get(i).eval(globals, program).toString());
-                if (i < expressions.size() - 1) System.out.print(' ');
-            }
-            System.out.print('\n');
-            return new Atom.Unit();
-        });
+        // load built-ins
+        loadProgram();
 
         // small standard library
         execute("let range = fn(a, b) => if (a == b - 1) then ([a]) else ([a] + range(a + 1, b))");
@@ -38,6 +33,35 @@ public class Interpreter {
         execute("let sum = fn(ls) => fold(fn (a, b) => a + b, 0, ls)");
         execute("let product = fn(ls) => fold(fn (a, b) => a * b, 1, ls)");
         execute("let reverse = fn(ls) => fold(fn (rs, el) => [el] + rs, [], ls)");
+    }
+
+    private void loadProgram() {
+        Function2<ArrayList<Expr>, Character, Atom> printFunc = (expressions, suffix) -> {
+            for (int i = 0; i < expressions.size(); i++) {
+                Atom val = expressions.get(i).eval(globals, program);
+                if (val instanceof Atom.Str) System.out.print(((Atom.Str)val).getStringValue());
+                else if (val instanceof Atom.Char) System.out.print(((Atom.Char)val).getCharValue());
+                else System.out.print(val.toString());
+                if (i < expressions.size() - 1) System.out.print(' ');
+            }
+            if (suffix != null) System.out.print(suffix);
+            return new Atom.Unit();
+        };
+        program.put("print", (expressions) -> printFunc.apply(expressions, null));
+        program.put("println", (expressions) -> printFunc.apply(expressions, '\n'));
+        program.put("input", (expressions) -> {
+            if (expressions.size() != 1) throw new Exception("Expected 1 argument to call of function input, got " + expressions.size());
+            Atom textAtom = expressions.get(0).eval(globals, program);
+            if (!(textAtom instanceof Atom.Str || textAtom instanceof Atom.Char)) throw new Exception(String.format("Can't coerce %s to a string or char", textAtom.toString()));
+            String textVal = null;
+            if (textAtom instanceof Atom.Str) textVal = ((Atom.Str)textAtom).getStringValue();
+            if (textAtom instanceof Atom.Char) textVal = ""+((Atom.Char)textAtom).val;
+            System.out.print(textVal);
+            Scanner in = new Scanner(System.in);
+            String inputVal = in.nextLine();
+            return new Atom.Str(inputVal);
+        });
+        
     }
 
     public Atom eval(String expr) throws Exception {
@@ -78,8 +102,16 @@ public class Interpreter {
      */
     public Atom evalAll(String[] exprs) throws Exception {
         for (int i = 0; i < exprs.length; i++) {
+            String expr = exprs[i].trim();
+            if (expr == "") continue;
             if (i == exprs.length - 1) return eval(expr); // Return if last, this is to skip overwriting a temp var.
             eval(expr); // Otherwise don't return the result
         }
+        return new Atom.Unit(); // If exprs array is empty, return the unit.
     }
+}
+
+@FunctionalInterface
+interface Function2<One, Two, Return> {
+    public Return apply(One one, Two two) throws Exception;
 }

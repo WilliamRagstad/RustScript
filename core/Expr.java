@@ -34,7 +34,7 @@ public abstract class Expr {
                     throw new Exception(String.format("Tried to access nonexistent variable %s", v.name));
                 }
                 return res;
-            } else if (val instanceof Atom.List) {
+            } else if (val instanceof Atom.List && !(val instanceof Atom.Str)) {
                 Atom.List ls = (Atom.List) val;
                 ArrayList<Expr> nls = new ArrayList<>();
                 for (Expr expr : ls.list) {

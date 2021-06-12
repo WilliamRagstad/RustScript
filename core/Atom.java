@@ -48,6 +48,10 @@ public abstract class Atom {
     	public Char(char val) {
             this.val = val;
         }
+        
+        public char getCharValue() {
+            return this.val;
+        }
 
         public String toString() {
             return '\'' + String.valueOf(val) + '\'';
@@ -68,17 +72,15 @@ public abstract class Atom {
         	}
         	return true;
         }
-        private String formatAsString() {
-        	assert isCharArray();
-        	String result = "\"";
-        	for(int i = 0; i < list.size(); i++) {
+        public String getStringValue() {
+            String result = "";
+            for(int i = 0; i < list.size(); i++) {
         		result += ((Atom.Char)((Expr.AtomicExpr)list.get(i)).val).val;
         	}
-        	return result + '"';
+        	return result;
         }
-
         public String toString() {
-        	if (isCharArray()) return formatAsString();
+        	if (isCharArray()) return String.format("\"%s\"", getStringValue());
             return list.toString();
         }
     }
@@ -94,6 +96,10 @@ public abstract class Atom {
     	
     	public Str(String val) {
     		super(split(val));
+        }
+        
+        public String toString() {
+            return super.toString();
         }
     }
 

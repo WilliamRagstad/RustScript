@@ -74,9 +74,6 @@ public class Test {
 
         assert ((Atom.Val) val13).val == 2178309;
 
-        Atom val14 = i.eval("'A'\n'B'\n'C'");
-        assert ((Atom.Char) val14).val == 'C'; 
-
         System.out.println("All tests passed!");
     }
 }
