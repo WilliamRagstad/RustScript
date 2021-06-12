@@ -140,8 +140,20 @@ public abstract class Atom {
     }
 
     public Atom add(Atom rhs) throws Exception {
+        if (this instanceof List && !(this instanceof Str) && ((List)this).isCharArray()) {
+            // If a List but classify as Str, convert it
+            return new Atom.Str(((List)this).getStringValue()).add(rhs);
+        }
+
         if ((this instanceof Val) && (rhs instanceof Val)) {
             return (Atom) new Val(((Val) this).val + ((Val) rhs).val);
+        } else if (this instanceof Str && rhs instanceof Str) {
+            return new Atom.Str(((Str)this).getStringValue() + ((Str)rhs).getStringValue());
+        } else if (this instanceof Str && !(rhs instanceof List)) { // Str is List
+            String value = ((Atom.Str)this).getStringValue();
+            if (rhs instanceof Val || rhs instanceof Bool)  return new Atom.Str(value + rhs.toString());
+            else if (rhs instanceof Char)                   return new Atom.Str(value + ((Atom.Char)rhs).val);
+            // else Badd
         } else if ((this instanceof List) && (rhs instanceof List)) {
             List lArr = (List) this;
             List rArr = (List) rhs;
@@ -149,10 +161,10 @@ public abstract class Atom {
             List newList = new List(new ArrayList<Expr>());
             newList.list.addAll(lArr.list);
             newList.list.addAll(rArr.list);
+            if (newList.isCharArray()) return new Atom.Str(newList.getStringValue());
             return (Atom) newList;
-        } else {
-            throw new Exception("Badd");
         }
+        throw new Exception("Badd");
     }
 
     public Atom sub(Atom rhs) throws Exception {
