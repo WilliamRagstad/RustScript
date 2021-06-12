@@ -48,14 +48,14 @@ public class Interpreter {
             if (suffix != null) System.out.print(suffix);
             return new Atom.Unit();
         };
-        Consumer2<ArrayList<Expr>, Integer> expect = (args, n) -> {
-            if (args.size() != n) throw new Exception(String.format("Expected %d argument to call of function input, got %d", n, args.size()));
+        Consumer3<ArrayList<Expr>, Integer, String> expect = (args, n, name) -> {
+            if (args.size() != n) throw new Exception(String.format("Expected %d argument to call of function %s, got %d", n, name, args.size()));
         };
         // Program built-ins
         program.put("print", (expressions) -> printFunc.apply(expressions, null));
         program.put("println", (expressions) -> printFunc.apply(expressions, '\n'));
         program.put("input", (expressions) -> {
-            expect.apply(expressions, 1);
+            expect.apply(expressions, 1, "input");
             Atom textAtom = expressions.get(0).eval(globals, program);
             if (!(textAtom instanceof Atom.Str || textAtom instanceof Atom.Char)) throw new Exception(String.format("Can't coerce %s to a string or char", textAtom.toString()));
             String textVal = null;
@@ -67,7 +67,7 @@ public class Interpreter {
             return new Atom.Str(inputVal);
         });
         program.put("typeof", (expressions) -> {
-            expect.apply(expressions, 1);
+            expect.apply(expressions, 1, "typeof");
             return new Atom.Str(expressions.get(0).eval(globals, program).getClass().getSimpleName());
         });
     }
@@ -124,6 +124,6 @@ interface Function2<One, Two, Return> {
     public Return apply(One one, Two two) throws Exception;
 }
 @FunctionalInterface
-interface Consumer2<One, Two> {
-    public void apply(One one, Two two) throws Exception;
+interface Consumer3<One, Two, Three> {
+    public void apply(One one, Two two, Three three) throws Exception;
 }
