@@ -108,7 +108,8 @@ public class Interpreter {
      * @param exprs Expressions to evaluate
      * @throws Exception
      */
-    public Atom evalAll(String[] exprs) throws Exception {
+    public Atom evalAll(String program) throws Exception {
+        String[] exprs = program.split("\n");   // Use both ; and \n to separate expressions, todo: Rigorous implementation
         for (int i = 0; i < exprs.length; i++) {
             String expr = exprs[i].trim();
             if (expr == "") continue;

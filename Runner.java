@@ -21,9 +21,9 @@ public class Runner {
         }
         Interpreter i;
         for (String file : args) {
-            String[] source;
+            String source;
             try {
-                source = Files.readString(Paths.get(file)).split("\n");
+                source = Files.readString(Paths.get(file));
             } catch (IOException e) {
                 e.printStackTrace();
                 continue;
