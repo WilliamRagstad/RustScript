@@ -37,10 +37,10 @@ public class Interpreter {
 
     private String GenerateKernelName(String functionName) {
         int kid = (int)(Math.random() * 1000);
-        return "kernel_" + functionName + "_" + kid;
+        return "kernel" + kid + "_" + functionName;
     }
 
-    private void loadProgram() {
+    private void loadProgram() throws Exception {
         // Helper functions
         Consumer3<ArrayList<Atom>, Integer, String> expect = (args, n, name) -> {
             if (args.size() != n) throw new Exception(String.format("Expected %d argument to call of function %s, got %d", n, name, args.size()));
