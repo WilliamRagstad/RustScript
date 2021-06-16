@@ -3,6 +3,6 @@ println(typeof(s))
 let s = s + "!"
 println(typeof(s))
 println(s)
-_println_("hej")
+println(lower(['H', 'E', 'J', 'S', 'A', 'N']))
 println(typeof(println))
 println( reverse(reverse("hi") + '!') )

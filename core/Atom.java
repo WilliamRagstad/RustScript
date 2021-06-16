@@ -65,7 +65,7 @@ public abstract class Atom {
             this.list = list;
         }
         
-        private boolean isCharArray() {
+        public boolean isCharArray() {
         	for(int i = 0; i < list.size(); i++) {
         		Expr e = list.get(i);
         		if (!(e instanceof Expr.AtomicExpr && ((Expr.AtomicExpr)e).val instanceof Atom.Char)) return false;

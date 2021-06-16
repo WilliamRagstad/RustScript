@@ -40,7 +40,9 @@ public abstract class Expr {
                 for (Expr expr : ls.list) {
                     nls.add(new AtomicExpr(expr.eval(variables, program)));
                 }
-                return new Atom.List(nls);
+                Atom.List result = new Atom.List(nls);
+                if (result.isCharArray()) return new Atom.Str(result.getStringValue());
+                return result;
             } else {
                 return val;
             }
