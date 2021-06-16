@@ -33,11 +33,11 @@ public class Interpreter {
         
         // load built-ins
         loadProgram();
-        // wrappers for built-ins
-        execute("let print = fn(s) => _print_(s)");
-        execute("let println = fn(s) => _println_(s)");
-        execute("let input = fn(s) => _input_(s)");
-        execute("let typeof = fn(e) => _typeof_(e)");
+    }
+
+    private String GenerateKernelName(String functionName) {
+        int kid = (int)(Math.random() * 1000);
+        return "kernel_" + functionName + "_" + kid;
     }
 
     private void loadProgram() {
@@ -56,10 +56,14 @@ public class Interpreter {
             if (suffix != null) System.out.print(suffix);
             return new Atom.Unit();
         };
-        // Program built-ins
-        program.put("_print_", (args) -> printFunc.apply(args, null));
-        program.put("_println_", (args) -> printFunc.apply(args, '\n'));
-        program.put("_input_", (args) -> {
+        // Load program built-ins
+        String print   = GenerateKernelName("print");
+        String println = GenerateKernelName("println");
+        String input   = GenerateKernelName("input");
+        String typeof  = GenerateKernelName("typeof");
+        program.put(print, (args) -> printFunc.apply(args, null));
+        program.put(println, (args) -> printFunc.apply(args, '\n'));
+        program.put(input, (args) -> {
             expect.apply(args, 1, "input");
             Atom textAtom = args.get(0); // args.get(0).eval(globals, program)
             if (!(textAtom instanceof Atom.Str || textAtom instanceof Atom.Char)) throw new Exception(String.format("Can't coerce %s to a string or char", textAtom.toString()));
@@ -71,10 +75,15 @@ public class Interpreter {
             String inputVal = in.nextLine();
             return new Atom.Str(inputVal);
         });
-        program.put("_typeof_", (args) -> {
+        program.put(typeof, (args) -> {
             expect.apply(args, 1, "typeof");
             return new Atom.Str(args.get(0).getClass().getSimpleName());
         });
+        // wrappers for built-ins
+        execute("let print = fn(s) => "   + print   + "(s)");
+        execute("let println = fn(s) => " + println + "(s)");
+        execute("let input = fn(s) => "   + input   + "(s)");
+        execute("let typeof = fn(e) => "  + typeof  + "(e)");
     }
 
     public Atom eval(String expr) throws Exception {
