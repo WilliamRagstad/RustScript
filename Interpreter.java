@@ -61,7 +61,8 @@ public class Interpreter {
         String println = GenerateKernelName("println");
         String input   = GenerateKernelName("input");
         String typeof  = GenerateKernelName("typeof");
-        program.put(print, (args) -> printFunc.apply(args, null));
+        String parseVal  = GenerateKernelName("parseVal");
+        program.put(print, (args) -> printFunc.apply(args, null));  // TODO: Allow print functions to accept any number of arguments
         program.put(println, (args) -> printFunc.apply(args, '\n'));
         program.put(input, (args) -> {
             expect.apply(args, 1, "input");
