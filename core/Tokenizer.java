@@ -212,7 +212,7 @@ public class Tokenizer {
             }
             default -> {
                 if (Character.isWhitespace(c)) addNextToken();
-                else if (Character.isAlphabetic(c)) {
+                else if (Character.isAlphabetic(c) || c == '_') {
                     position -= 1;
                     scanIdent();
                 } else if (Character.isDigit(c)) {
