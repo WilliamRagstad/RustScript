@@ -185,8 +185,16 @@ public abstract class Expr {
             Atom.Lambda lambda = ((Atom.Lambda) evaledVariables.get(this.name));
             if (lambda != null) return evalLambda(lambda, evaledVariables, variables, program);
             ProgramFunction pf = program.get(this.name);
-            if (pf != null) return pf.call(this.variables);
+            if (pf != null) return evalProgFunc(pf, evaledVariables, variables, program);
             throw new Exception(String.format("Undefined function '%s'", this.name));
+        }
+
+        public Atom evalProgFunc(ProgramFunction pf, HashMap<String, Atom> evaledVariables, HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
+            ArrayList<Atom> args = new ArrayList<>();
+            for (Expr expr : this.variables) {
+                args.add(expr.eval(evaledVariables, program));
+            }
+            return pf.call(args);
         }
 
         public Atom evalLambda(Atom.Lambda lambda, HashMap<String, Atom> evaledVariables, HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {

@@ -4,13 +4,14 @@ import java.util.NoSuchElementException;
 public class Repl {
     public static void main(String[] args) throws Exception {
         Interpreter i = new Interpreter();
-        Scanner sc = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in); // Does not support unicode (e.g å, ä, ö)
         for (;;) {
             try {
                 System.out.print("> ");
                 String expr = sc.nextLine();
                 i.execute(expr);
             } catch (NoSuchElementException e) {
+                System.out.println(e.getMessage());
                 sc.close();
                 break;
             } catch (Exception e) {

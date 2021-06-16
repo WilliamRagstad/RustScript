@@ -22,9 +22,6 @@ public class Interpreter {
         globals = new HashMap<>();
         program = new HashMap<>();
 
-        // load built-ins
-        loadProgram();
-
         // small standard library
         execute("let range = fn(a, b) => if (a == b - 1) then ([a]) else ([a] + range(a + 1, b))");
         execute("let fmap = fn(f, ls) => if (ls) then ([f(^ls)] + fmap(f, $ls)) else ([])");
@@ -33,30 +30,38 @@ public class Interpreter {
         execute("let sum = fn(ls) => fold(fn (a, b) => a + b, 0, ls)");
         execute("let product = fn(ls) => fold(fn (a, b) => a * b, 1, ls)");
         execute("let reverse = fn(ls) => fold(fn (rs, el) => [el] + rs, [], ls)");
+        
+        // load built-ins
+        loadProgram();
+        // wrappers for built-ins
+        execute("let print = fn(s) => _print_(s)");
+        execute("let println = fn(s) => _println_(s)");
+        execute("let input = fn(s) => _input_(s)");
+        execute("let typeof = fn(e) => _typeof_(e)");
     }
 
     private void loadProgram() {
         // Helper functions
-        Function2<ArrayList<Expr>, Character, Atom> printFunc = (expressions, suffix) -> {
-            for (int i = 0; i < expressions.size(); i++) {
-                Atom val = expressions.get(i).eval(globals, program);
+        Consumer3<ArrayList<Atom>, Integer, String> expect = (args, n, name) -> {
+            if (args.size() != n) throw new Exception(String.format("Expected %d argument to call of function %s, got %d", n, name, args.size()));
+        };
+        Function2<ArrayList<Atom>, Character, Atom> printFunc = (args, suffix) -> {
+            for (int i = 0; i < args.size(); i++) {
+                Atom val = args.get(i); // args.get(i).eval(globals, program)
                 if (val instanceof Atom.Str) System.out.print(((Atom.Str)val).getStringValue());
                 else if (val instanceof Atom.Char) System.out.print(((Atom.Char)val).getCharValue());
                 else System.out.print(val.toString());
-                if (i < expressions.size() - 1) System.out.print(' ');
+                if (i < args.size() - 1) System.out.print(' ');
             }
             if (suffix != null) System.out.print(suffix);
             return new Atom.Unit();
         };
-        Consumer3<ArrayList<Expr>, Integer, String> expect = (args, n, name) -> {
-            if (args.size() != n) throw new Exception(String.format("Expected %d argument to call of function %s, got %d", n, name, args.size()));
-        };
         // Program built-ins
-        program.put("print", (expressions) -> printFunc.apply(expressions, null));
-        program.put("println", (expressions) -> printFunc.apply(expressions, '\n'));
-        program.put("input", (expressions) -> {
-            expect.apply(expressions, 1, "input");
-            Atom textAtom = expressions.get(0).eval(globals, program);
+        program.put("_print_", (args) -> printFunc.apply(args, null));
+        program.put("_println_", (args) -> printFunc.apply(args, '\n'));
+        program.put("_input_", (args) -> {
+            expect.apply(args, 1, "input");
+            Atom textAtom = args.get(0); // args.get(0).eval(globals, program)
             if (!(textAtom instanceof Atom.Str || textAtom instanceof Atom.Char)) throw new Exception(String.format("Can't coerce %s to a string or char", textAtom.toString()));
             String textVal = null;
             if (textAtom instanceof Atom.Str) textVal = ((Atom.Str)textAtom).getStringValue();
@@ -66,9 +71,9 @@ public class Interpreter {
             String inputVal = in.nextLine();
             return new Atom.Str(inputVal);
         });
-        program.put("typeof", (expressions) -> {
-            expect.apply(expressions, 1, "typeof");
-            return new Atom.Str(expressions.get(0).eval(globals, program).getClass().getSimpleName());
+        program.put("_typeof_", (args) -> {
+            expect.apply(args, 1, "typeof");
+            return new Atom.Str(args.get(0).getClass().getSimpleName());
         });
     }
 
