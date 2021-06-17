@@ -263,6 +263,7 @@ public class Parser {
                 case LT -> BinOp.LT;
                 case GT -> BinOp.GT;
                 case EQ -> BinOp.EQ;
+                case NEQ -> BinOp.NEQ;
                 case And -> BinOp.And;
                 case Or -> BinOp.Or;
                 default -> null;

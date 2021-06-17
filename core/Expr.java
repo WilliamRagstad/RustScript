@@ -106,7 +106,8 @@ public abstract class Expr {
                 case Mod -> lhs.eval(variables, program).mod(rhs.eval(variables, program));
                 case LT -> lhs.eval(variables, program).lt(rhs.eval(variables, program));
                 case GT -> lhs.eval(variables, program).gt(rhs.eval(variables, program));
-                case EQ -> lhs.eval(variables, program).eq(rhs.eval(variables, program));
+                case EQ -> lhs.eval(variables, program).eq(rhs.eval(variables, program), variables, program);
+                case NEQ -> lhs.eval(variables, program).eq(rhs.eval(variables, program), variables, program).negate();
                 case And -> lhs.eval(variables, program).and(rhs.eval(variables, program));
                 case Or -> lhs.eval(variables, program).or(rhs.eval(variables, program));
             };

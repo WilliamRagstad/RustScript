@@ -45,7 +45,7 @@ enum TokenTy {
 
     Add, Sub, Mul, Div, Mod,
 
-    EQ, LT, GT,
+    EQ, LT, GT, NEQ,
 
     And, Or,
 

@@ -19,7 +19,7 @@ public class BindingPower {
                 this.left = 6;
                 this.right = 7;
             }
-            case LT, GT, EQ -> {
+            case LT, GT, EQ, NEQ -> {
                 this.left = 2;
                 this.right = 3;
             }
@@ -34,7 +34,7 @@ public class BindingPower {
 enum BinOp {
     Add, Sub, Mul, Div,
 
-    LT, GT, EQ,
+    LT, GT, EQ, NEQ,
 
     And, Or,
 

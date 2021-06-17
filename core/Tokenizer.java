@@ -210,6 +210,11 @@ public class Tokenizer {
                     addToken(TokenTy.Assign, "=");
                 }
             }
+            case '!' -> {
+                if (expect('=')) {
+                    addToken(TokenTy.NEQ, "!=");
+                }
+            }
             default -> {
                 if (Character.isWhitespace(c)) addNextToken();
                 else if (Character.isAlphabetic(c) || c == '_') {
