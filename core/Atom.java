@@ -215,12 +215,26 @@ public abstract class Atom {
         }
     }
 
-    public Atom eq(Atom rhs) throws Exception {
+    public Atom eq(Atom rhs, HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
         if ((this instanceof Val) && (rhs instanceof Val)) {
-            return (Atom) new Bool(((Val) this).val == ((Val) rhs).val);
+            return (Atom)new Bool(((Val) this).val == ((Val) rhs).val);
         }
         else if (this instanceof Bool || rhs instanceof Bool) {
-            return (Atom) new Bool(this.isTruthy() == rhs.isTruthy());
+            return (Atom)new Bool(this.isTruthy() == rhs.isTruthy());
+        }
+        else if (this instanceof Char || rhs instanceof Char) {
+            return (Atom)new Bool(((Char)this).val == ((Char)rhs).val);
+        }
+        else if (this instanceof List && rhs instanceof List) {
+            List lhs   = (List)this;
+            List other = (List)rhs;
+            if (lhs.list.size() != other.list.size()) return (Atom)new Bool(false);
+            for (int i = 0; i < lhs.list.size(); i++) {
+                Atom first = lhs.list.get(i).eval(variables, program);
+                Atom second = other.list.get(i).eval(variables, program);
+                if (!first.eq(second, variables, program).isTruthy()) return (Atom)""new Bool(false);
+            }
+            return (Atom)new Bool(true);
         }
         else {
             throw new Exception("Bad Cmp");
