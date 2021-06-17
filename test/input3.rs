@@ -1,3 +1,6 @@
 let text = input("Enter number: ")
+println(parseVal)
 let val = parseVal(text)
+println(typeof(val))
+println(val)
 if val != () then println(val * 2) else println("Could not parse input number!")

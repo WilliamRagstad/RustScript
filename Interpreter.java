@@ -4,6 +4,7 @@ import java.util.Scanner;
 import java.util.function.Function;
 
 import core.*;
+import core.Atom.Unit;
 
 /**
  * @author Mikail Khan <mikail@mikail-khan.com>
@@ -42,8 +43,11 @@ public class Interpreter {
 
     private void loadProgram() throws Exception {
         // Helper functions
-        Consumer3<ArrayList<Atom>, Integer, String> expect = (args, n, name) -> {
+        Consumer3<ArrayList<Atom>, Integer, String> expectArgs = (args, n, name) -> {
             if (args.size() != n) throw new Exception(String.format("Expected %d argument to call of function %s, got %d", n, name, args.size()));
+        };
+        Consumer3<Atom, Class<?>, String> expectType = (arg, expected, name) -> {
+            if (arg.getClass() != expected) throw new Exception(String.format("Type missmatch! Invalid argument %s to function %s, is not of type %s", arg.toString(), name, expected.getSimpleName()));
         };
         Function2<ArrayList<Atom>, Character, Atom> printFunc = (args, suffix) -> {
             for (int i = 0; i < args.size(); i++) {
@@ -57,15 +61,18 @@ public class Interpreter {
             return new Atom.Unit();
         };
         // Load program built-ins
-        String print   = GenerateKernelName("print");
-        String println = GenerateKernelName("println");
-        String input   = GenerateKernelName("input");
-        String typeof  = GenerateKernelName("typeof");
-        String parseVal  = GenerateKernelName("parseVal");
+        String print        = GenerateKernelName("print");
+        String println      = GenerateKernelName("println");
+        String input        = GenerateKernelName("input");
+        String typeof       = GenerateKernelName("typeof");
+        String upper        = GenerateKernelName("upper");
+        String lower        = GenerateKernelName("lower");
+        String parseVal     = GenerateKernelName("parseVal");
+        String parseBool    = GenerateKernelName("parseBool");
         program.put(print, (args) -> printFunc.apply(args, null));  // TODO: Allow print functions to accept any number of arguments
         program.put(println, (args) -> printFunc.apply(args, '\n'));
         program.put(input, (args) -> {
-            expect.apply(args, 1, "input");
+            expectArgs.apply(args, 1, "input");
             Atom textAtom = args.get(0); // args.get(0).eval(globals, program)
             if (!(textAtom instanceof Atom.Str || textAtom instanceof Atom.Char)) throw new Exception(String.format("Can't coerce %s to a string or char", textAtom.toString()));
             String textVal = null;
@@ -77,14 +84,41 @@ public class Interpreter {
             return new Atom.Str(inputVal);
         });
         program.put(typeof, (args) -> {
-            expect.apply(args, 1, "typeof");
+            expectArgs.apply(args, 1, "typeof");
             return new Atom.Str(args.get(0).getClass().getSimpleName());
         });
+        program.put(upper, (args) -> {
+            expectArgs.apply(args, 1, "upper");
+            expectType.apply(args.get(0), Atom.Str.class, "upper");
+            return new Atom.Str(((Atom.Str)args.get(0)).getStringValue().toUpperCase());
+        });
+        program.put(lower, (args) -> {
+            expectArgs.apply(args, 1, "lower");
+            expectType.apply(args.get(0), Atom.Str.class, "lower");
+            return new Atom.Str(((Atom.Str)args.get(0)).getStringValue().toLowerCase());
+        });
+        // Parsing
+        program.put(parseVal, (args) -> {
+            expectArgs.apply(args, 1, "parseVal");
+            expectType.apply(args.get(0), Atom.Str.class, "parseVal");
+            try { return new Atom.Val(Integer.parseInt(((Atom.Str)args.get(0)).getStringValue())); }
+            catch(Exception e) { return new Atom.Unit(); }
+        });
+        program.put(parseBool, (args) -> {
+            expectArgs.apply(args, 1, "parseBool");
+            expectType.apply(args.get(0), Atom.Str.class, "parseBool");
+            try { return new Atom.Bool(Boolean.parseBoolean(((Atom.Str)args.get(0)).getStringValue())); }
+            catch(Exception e) { return new Atom.Unit(); }
+        });
         // wrappers for built-ins
-        execute("let print = fn(s) => "   + print   + "(s)");
-        execute("let println = fn(s) => " + println + "(s)");
-        execute("let input = fn(s) => "   + input   + "(s)");
-        execute("let typeof = fn(e) => "  + typeof  + "(e)");
+        execute("let print = fn(s) => "   + print       + "(s)");
+        execute("let println = fn(s) => " + println     + "(s)");
+        execute("let input = fn(s) => "   + input       + "(s)");
+        execute("let typeof = fn(e) => "  + typeof      + "(e)");
+        execute("let upper = fn(s) => "   + upper       + "(s)");
+        execute("let lower = fn(s) => "   + lower       + "(s)");
+        execute("let parseVal = fn(s) => " + parseVal   + "(s)");
+        execute("let parseBool = fn(s) => "+ parseBool  + "(s)");
     }
 
     public Atom eval(String expr) throws Exception {
@@ -138,6 +172,10 @@ public class Interpreter {
 @FunctionalInterface
 interface Function2<One, Two, Return> {
     public Return apply(One one, Two two) throws Exception;
+}
+@FunctionalInterface
+interface Consumer2<One, Two> {
+    public void apply(One one, Two two) throws Exception;
 }
 @FunctionalInterface
 interface Consumer3<One, Two, Three> {
