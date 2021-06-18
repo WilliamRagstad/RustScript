@@ -1,6 +1,4 @@
 let text = input("Enter number: ")
-println(parseVal)
 let val = parseVal(text)
 println(typeof(val))
-println(val)
-if typeof(val) != "Unit" then println(val * 2) else println("Could not parse input number!")
+if typeof(val) == "Val" then println(val * 2) else println("Could not parse input number!")
