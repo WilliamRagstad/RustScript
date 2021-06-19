@@ -202,6 +202,8 @@ public abstract class Atom {
     public Atom lt(Atom rhs) throws Exception {
         if ((this instanceof Val) && (rhs instanceof Val)) {
             return (Atom) new Bool(((Val) this).val < ((Val) rhs).val);
+        } else if (this instanceof Char && rhs instanceof Char) {
+            return (Atom) new Bool(((Char) this).val < ((Char) rhs).val);
         } else {
             throw new Exception("Bad Cmp");
         }
@@ -210,6 +212,8 @@ public abstract class Atom {
     public Atom gt(Atom rhs) throws Exception {
         if ((this instanceof Val) && (rhs instanceof Val)) {
             return (Atom) new Bool(((Val) this).val > ((Val) rhs).val);
+        } else if (this instanceof Char && rhs instanceof Char) {
+            return (Atom) new Bool(((Char) this).val > ((Char) rhs).val);
         } else {
             throw new Exception("Bad Cmp");
         }
@@ -232,7 +236,7 @@ public abstract class Atom {
             for (int i = 0; i < lhs.list.size(); i++) {
                 Atom first = lhs.list.get(i).eval(variables, program);
                 Atom second = other.list.get(i).eval(variables, program);
-                if (!first.eq(second, variables, program).isTruthy()) return (Atom)""new Bool(false);
+                if (!first.eq(second, variables, program).isTruthy()) return (Atom)new Bool(false);
             }
             return (Atom)new Bool(true);
         }
