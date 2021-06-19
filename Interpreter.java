@@ -107,8 +107,10 @@ public class Interpreter {
         program.put(parseBool, (args) -> {
             expectArgs.apply(args, 1, "parseBool");
             expectType.apply(args.get(0), Atom.Str.class, "parseBool");
-            try { return new Atom.Bool(Boolean.parseBoolean(((Atom.Str)args.get(0)).getStringValue())); }
-            catch(Exception e) { return new Atom.Unit(); }
+            String val = ((Atom.Str)args.get(0)).getStringValue().trim().toLowerCase();
+            if (val.equals("true")) return new Atom.Bool(true);
+            else if (val.equals("false")) return new Atom.Bool(false);
+            else return new Atom.Unit();
         });
         // wrappers for built-ins
         execute("let print = fn(s) => "   + print       + "(s)");
