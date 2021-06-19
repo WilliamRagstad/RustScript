@@ -211,6 +211,9 @@ public class Parser {
     }
 
     private Expr exprBP(int minBP) throws Exception {
+        return this.exprBP(minBP, false);
+    }
+    private Expr exprBP(int minBP, boolean allowEOF) throws Exception {
         Token nx = eat();
         int s = nx.index;
         Expr lhs = switch (nx.ty) {
@@ -249,7 +252,10 @@ public class Parser {
                 Expr rhs = exprBP(bp.right);
                 yield new Expr.PrefixExpr(op, rhs, s, rhs.endIndex);
             }
-            default -> throw new Exception(String.format("Expected an expression, found: %s", nx.toString()));
+            default -> {
+                if (allowEOF && nx.ty == TokenTy.EOF) yield new Expr.AtomicExpr(new Atom.Unit(), s, s+1);
+                else throw new Exception(String.format("Expected an expression, found: %s", nx.toString()));
+            }
         };
 
         for (;;) {
@@ -292,7 +298,7 @@ public class Parser {
         ArrayList<Token> tokens = Tokenizer.tokenize(input);
         Parser p = new Parser(tokens);
 
-        return p.exprBP(0);
+        return p.exprBP(0, true);
     }
 
     public static void testParser() throws Exception {

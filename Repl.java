@@ -8,8 +8,7 @@ public class Repl {
         for (;;) {
             try {
                 System.out.print("> ");
-                String expr = sc.nextLine().trim();
-                if (expr.equals("")) continue;
+                String expr = sc.nextLine();
                 i.execute(expr);
             } catch (NoSuchElementException e) {
                 System.out.println(e.getMessage());

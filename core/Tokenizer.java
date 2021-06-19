@@ -163,6 +163,10 @@ public class Tokenizer {
     	addToken(TokenTy.String, string);
     }
 
+    private void scanComment() {
+        while(!isFinished() && peek() != '\n' && peek() != '\r') eat();
+    }
+
     private void addNextToken() throws Exception {
         char c = eat();
         switch (c) {
@@ -174,7 +178,13 @@ public class Tokenizer {
             case '-' -> addToken(TokenTy.Sub, c);
             case '*' -> addToken(TokenTy.Mul, c);
             case '%' -> addToken(TokenTy.Mod, c);
-            case '/' -> addToken(TokenTy.Div, c);
+            case '/' -> {
+                if (expect('/')) {
+                    scanComment();
+                } else {
+                    addToken(TokenTy.Div, c);
+                }
+            }
             case '<' -> addToken(TokenTy.LT, c);
             case '>' -> addToken(TokenTy.GT, c);
             case ',' -> addToken(TokenTy.Comma, c);
