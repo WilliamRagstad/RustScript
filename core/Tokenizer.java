@@ -11,12 +11,14 @@ import java.util.ArrayList;
  */
 public class Tokenizer {
     private String input;
-    private int position;
+    private int position, line, column;
     private ArrayList<Token> output;
 
     private Tokenizer(String input) {
         this.input = input;
         this.position = 0;
+        this.line = 1;
+        this.column = 0;
         this.output = new ArrayList<Token>();
     }
 
@@ -31,6 +33,11 @@ public class Tokenizer {
     private char eat() {
         char ret = input.charAt(position);
         position += 1;
+        column += 1;
+        if (ret == '\n') {
+            line += 1;
+            column = 0;
+        }
         return ret;
     }
 
@@ -42,6 +49,10 @@ public class Tokenizer {
         } else {
             return false;
         }
+    }
+
+    private String error(String message) {
+        return "Error at line " + this.line + " column " + this.column + ": " + message;
     }
 
     private void addToken(Token t) {
@@ -133,13 +144,13 @@ public class Tokenizer {
             eat();
             if (escaped && (peek() == '\'' || peek() == '\\')) eat(); // eat escaped apostrophes or backslashes
         }
-    	if (start == position) throw new Exception("Missing character, '' is not valid.");
+    	if (start == position) throw new Exception(error("Missing character, '' is not valid."));
         String lexeme = input.substring(start, position);
     	if (!isFinished() && peek() == '\'') eat();
-    	else throw new Exception("Found character with a missing closing apostrophe, did you mean '" + lexeme + "'?");
+    	else throw new Exception(error("Found character with a missing closing apostrophe, did you mean '" + lexeme + "'?"));
     	
     	String characters = unescaper(lexeme);
-    	if (characters.length() > 1) throw new Exception("Found invalid character, did you mean \"" + characters + "\"?");
+    	if (characters.length() > 1) throw new Exception(error("Found invalid character, did you mean \"" + characters + "\"?"));
     	char character = characters.charAt(0);
 
     	addToken(TokenTy.Character, "" + character);
@@ -156,7 +167,7 @@ public class Tokenizer {
         }
         String lexeme = input.substring(start, position);
     	if (!isFinished() && peek() == '"') eat();
-    	else throw new Exception("Found string with a missing closing quotation mark, did you mean \"" + lexeme + "\"?");
+    	else throw new Exception(error("Found string with a missing closing quotation mark, did you mean \"" + lexeme + "\"?"));
     	
     	String string = unescaper(lexeme);
 
@@ -194,21 +205,21 @@ public class Tokenizer {
                 if (expect('|')) {
                     addToken(TokenTy.Or, "||");
                 } else {
-                    throw new Exception("Found a single '|', did you mean '||'?");
+                    throw new Exception(error("Found a single '|', did you mean '||'?"));
                 }
             }
             case '&' -> {
                 if (expect('&')) {
                     addToken(TokenTy.And, "&&");
                 } else {
-                    throw new Exception("Found a single '&', did you mean '&&'?");
+                    throw new Exception(error("Found a single '&', did you mean '&&'?"));
                 }
             }
             case '.' -> {
                 if (expect('.')) {
                     addToken(TokenTy.DotDot, "..");
                 } else {
-                    throw new Exception("Found a single '.', did you mean '..'?");
+                    throw new Exception(error("Found a single '.', did you mean '..'?"));
                 }
             }
             case '=' -> {
@@ -224,7 +235,7 @@ public class Tokenizer {
                 if (expect('=')) {
                     addToken(TokenTy.NEQ, "!=");
                 } else {
-                    throw new Exception("Found a single '!', did you mean '!='?");
+                    throw new Exception(error("Found a single '!', did you mean '!='?"));
                 }
             }
             default -> {
@@ -242,7 +253,7 @@ public class Tokenizer {
                     position -= 1;
                     scanString();
                 } else {
-                    throw new Exception(String.format("Unexpected character: %c", c));
+                    throw new Exception(error(String.format("Unexpected character '%c'.", c)));
                 }
             }
         };
