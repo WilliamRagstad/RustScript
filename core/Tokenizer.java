@@ -213,6 +213,8 @@ public class Tokenizer {
             case '!' -> {
                 if (expect('=')) {
                     addToken(TokenTy.NEQ, "!=");
+                } else {
+                    throw new Exception("Found a single '!', did you mean '!='?");
                 }
             }
             default -> {
