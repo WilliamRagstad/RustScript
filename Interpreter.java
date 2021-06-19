@@ -67,6 +67,7 @@ public class Interpreter {
         String typeof       = GenerateKernelName("typeof");
         String upper        = GenerateKernelName("upper");
         String lower        = GenerateKernelName("lower");
+        String substr       = GenerateKernelName("substr");
         String parseVal     = GenerateKernelName("parseVal");
         String parseBool    = GenerateKernelName("parseBool");
         program.put(print, (args) -> printFunc.apply(args, null));  // TODO: Allow print functions to accept any number of arguments
@@ -97,6 +98,15 @@ public class Interpreter {
             expectType.apply(args.get(0), Atom.Str.class, "lower");
             return new Atom.Str(((Atom.Str)args.get(0)).getStringValue().toLowerCase());
         });
+        program.put(substr, (args) -> {
+            expectArgs.apply(args, 3, "substr");
+            expectType.apply(args.get(0), Atom.Str.class, "substr");
+            expectType.apply(args.get(1), Atom.Val.class, "substr");
+            expectType.apply(args.get(2), Atom.Val.class, "substr");
+            int start = ((Atom.Val)args.get(1)).val;
+            int end = ((Atom.Val)args.get(2)).val;
+            return new Atom.Str(((Atom.Str)args.get(0)).getStringValue().substring(start, end));
+        });
         // Parsing
         program.put(parseVal, (args) -> {
             expectArgs.apply(args, 1, "parseVal");
@@ -119,6 +129,7 @@ public class Interpreter {
         execute("let typeof = fn(e) => "  + typeof      + "(e)");
         execute("let upper = fn(s) => "   + upper       + "(s)");
         execute("let lower = fn(s) => "   + lower       + "(s)");
+        execute("let substr = fn(s, b, e) => "   + substr     + "(s, b, e)");
         execute("let parseVal = fn(s) => " + parseVal   + "(s)");
         execute("let parseBool = fn(s) => "+ parseBool  + "(s)");
     }
