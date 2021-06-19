@@ -22,6 +22,9 @@ public class Interpreter {
     public Interpreter() throws Exception {
         globals = new HashMap<>();
         program = new HashMap<>();
+        
+        // load built-ins
+        loadProgram();
 
         // small standard library
         execute("let range = fn(a, b) => if (a == b - 1) then ([a]) else ([a] + range(a + 1, b))");
@@ -31,9 +34,8 @@ public class Interpreter {
         execute("let sum = fn(ls) => fold(fn (a, b) => a + b, 0, ls)");
         execute("let product = fn(ls) => fold(fn (a, b) => a * b, 1, ls)");
         execute("let reverse = fn(ls) => fold(fn (rs, el) => [el] + rs, [], ls)");
-        
-        // load built-ins
-        loadProgram();
+        execute("let seq = fn(ls) => ^reverse(ls)"); // Return the last element of the list, which is evaluated from first to last.
+        execute("let has = fn(val) => typeof(val) != \"Unit\"");
     }
 
     private String GenerateKernelName(String functionName) {
