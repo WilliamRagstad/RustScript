@@ -1,4 +1,4 @@
-let R1 = ^reverse([let d = "ThisIsNice", let d = substr(d, 6, 10), d + " weather"]);
+let R1 = ^reverse([let d = "ThisIsNice", let d = substr(d, 6, 10), d + " weather"])
 
 let R2 = ^reverse([
     let d = println("This"),
