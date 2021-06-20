@@ -61,5 +61,5 @@ enum TokenTy {
 
     For, In, DotDot,
 
-    EOF
+    SColon, NL, EOF
 }

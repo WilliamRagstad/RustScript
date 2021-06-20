@@ -17,7 +17,7 @@ import java.util.ArrayList;
  *
  */
 public class Parser {
-    int position;
+    int position, line, column;
     ArrayList<Token> tokens;
 
     private Parser(ArrayList<Token> tokens) {
@@ -30,16 +30,31 @@ public class Parser {
     }
 
     private Token peek() {
-        return isFinished() ? Token.EOF(position) : tokens.get(position);
+        return peek(true);
+    }
+    private Token peek(boolean inExpr) {
+        return peek(inExpr, 0);
+    }
+    private Token peek(boolean inExpr, int offset) {
+        if (isFinished() || position + offset >= tokens.size()) return Token.EOF(position, line, column);
+        Token ret = tokens.get(position + offset);
+        if (inExpr && ret.ty == TokenTy.NL) return peek(true, offset + 1);
+        return ret;
     }
 
     private Token eat() {
+        return eat(true);
+    }
+    private Token eat(boolean inExpr) {
         if (!isFinished()) {
             Token ret = tokens.get(position);
             position += 1;
-            return ret;
+            line = ret.line;
+            column = ret.column;
+            if (inExpr && ret.ty == TokenTy.NL) return eat(true);
+            else return ret;
         } else {
-            return Token.EOF(position);
+            return Token.EOF(position, line, column);
         }
     }
 
@@ -79,7 +94,7 @@ public class Parser {
         return new Expr.IfExpr(cond, lhs, rhs, nx.index, rhs.endIndex);
     }
     private Expr parseIfExpr() throws Exception {
-        return parseIfExpr(Token.EOF(-1));
+        return parseIfExpr(Token.EOF(position, line, column));
     }
 
     private Expr parseList(Token nx) throws Exception {
@@ -158,7 +173,7 @@ public class Parser {
         }
     }
     private Expr parseList() throws Exception {
-        return parseList(Token.EOF(-1));
+        return parseList(Token.EOF(position, line, column));
     }
 
     private ArrayList<Expr> parseCallArgs() throws Exception {
@@ -188,7 +203,7 @@ public class Parser {
         return new Expr.AssignExpr(ident.lexeme, rhs, nx.index, rhs.endIndex);
     }
     private Expr parseLetExpr() throws Exception {
-        return parseLetExpr(Token.EOF(-1));
+        return parseLetExpr(Token.EOF(position, line, column));
     }
 
     private Expr parseLambdaExpr(Token next) throws Exception {
@@ -214,13 +229,13 @@ public class Parser {
         return new Expr.AtomicExpr(new Atom.Lambda(expr, argNames), next.index, expr.endIndex);
     }
     private Expr parseLambdaExpr() throws Exception {
-        return parseLambdaExpr(Token.EOF(-1));
+        return parseLambdaExpr(Token.EOF(position, line, column));
     }
 
     private Expr exprBP(int minBP) throws Exception {
         return this.exprBP(minBP, false);
     }
-    private Expr exprBP(int minBP, boolean allowEOF) throws Exception {
+    private Expr exprBP(int minBP, boolean allowWhiteSpace) throws Exception {
         Token nx = eat();
         int s = nx.index;
         Expr lhs = switch (nx.ty) {
@@ -260,8 +275,7 @@ public class Parser {
                 yield new Expr.PrefixExpr(op, rhs, s, rhs.endIndex);
             }
             default -> {
-                if (allowEOF && nx.ty == TokenTy.EOF) yield new Expr.AtomicExpr(new Atom.Unit(), s, s+1);
-                else throw new Exception(String.format("Expected an expression, found: %s", nx.toString()));
+                if (allowWhiteSpace && (nx.ty == TokenTy.EOF || nx.ty == TokenTy.NL)) yield new Expr.AtomicExpr(new Atom.Unit(), s, s+1);
                 else throw new Exception(error(nx, String.format("Expected an expression, found: %s", nx.toString())));
             }
         };
@@ -302,12 +316,37 @@ public class Parser {
         return lhs;
     }
 
-            else if (n.ty != TokenTy.SColon || n.ty != TokenTy.NL) throw new Exception(error(n, "Unexpected end of expression! Must have an ending ';' or newline till next expression."));
+    private Expr[] exprBPs(int minBP) throws Exception {
+        return this.exprBPs(minBP, false);
+    }
+    private Expr[] exprBPs(int minBP, boolean allowWhiteSpace) throws Exception {
+        ArrayList<Expr> exprs = new ArrayList<>();
+        Token n;
+        while(!isFinished()) {
+            Expr e = exprBP(0, true);
+            exprs.add(e);
+            n = peek(false);
+            if (n.ty == TokenTy.EOF) break;
+            else if (n.ty != TokenTy.SColon && n.ty != TokenTy.NL) throw new Exception(error(n, "Unexpected end of expression! Must have an ending ';' or newline till next expression."));
+            eat(false); // Eat n, the separating '\n' or ';'
+        }
+        Expr[] ret = new Expr[exprs.size()];
+        ret = exprs.toArray(ret);
+        return ret;
+    }
+
     public static Expr parseExpr(String input) throws Exception {
         ArrayList<Token> tokens = Tokenizer.tokenize(input);
         Parser p = new Parser(tokens);
 
         return p.exprBP(0, true);
+    }
+
+    public static Expr[] parseExprs(String input) throws Exception {
+        ArrayList<Token> tokens = Tokenizer.tokenize(input);
+        Parser p = new Parser(tokens);
+        
+        return p.exprBPs(0, true);
     }
 
     public static void testParser() throws Exception {

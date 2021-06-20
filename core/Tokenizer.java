@@ -60,11 +60,11 @@ public class Tokenizer {
     }
 
     private void addToken(TokenTy ty, char lexeme) {
-        addToken(new Token(ty, String.valueOf(lexeme), position, 1));
+        addToken(new Token(ty, String.valueOf(lexeme), position, 1, line, column));
     }
 
     private void addToken(TokenTy ty, String lexeme) {
-        addToken(new Token(ty, lexeme, position, lexeme.length()));
+        addToken(new Token(ty, lexeme, position, lexeme.length(), line, column));
     }
 
     private void scanIdent() {
@@ -199,6 +199,7 @@ public class Tokenizer {
             case '<' -> addToken(TokenTy.LT, c);
             case '>' -> addToken(TokenTy.GT, c);
             case ',' -> addToken(TokenTy.Comma, c);
+            case ';' -> addToken(TokenTy.SColon, c);
             case '^' -> addToken(TokenTy.Caret, c);
             case '$' -> addToken(TokenTy.Dollar, c);
             case '|' -> {
@@ -238,6 +239,7 @@ public class Tokenizer {
                     throw new Exception(error("Found a single '!', did you mean '!='?"));
                 }
             }
+            case '\n' -> addToken(TokenTy.NL, c);
             default -> {
                 if (Character.isWhitespace(c)) addNextToken();
                 else if (Character.isAlphabetic(c) || c == '_') {

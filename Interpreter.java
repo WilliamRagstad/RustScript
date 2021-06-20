@@ -172,15 +172,15 @@ public class Interpreter {
      * @param exprs Expressions to evaluate
      * @throws Exception
      */
-    public Atom evalAll(String program) throws Exception {
-        String[] exprs = program.split("\n");   // Use both ; and \n to separate expressions, todo: Rigorous implementation
+    public Atom[] evalAll(String program) throws Exception {
+        Expr[] exprs = Parser.parseExprs(program);   // Use both ; and \n to separate expressions, todo: Rigorous implementation
+        ArrayList<Atom> results = new ArrayList<>();
         for (int i = 0; i < exprs.length; i++) {
-            String expr = exprs[i].trim();
-            if (expr == "") continue;
-            if (i == exprs.length - 1) return eval(expr); // Return if last, this is to skip overwriting a temp var.
-            eval(expr); // Otherwise don't return the result
+            results.add(exprs[i].eval(this.globals, this.program));
         }
-        return new Atom.Unit(); // If exprs array is empty, return the unit.
+        Atom[] ret = new Atom[results.size()];
+        ret = results.toArray(ret);
+        return ret;
     }
 }
 
