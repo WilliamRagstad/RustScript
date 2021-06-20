@@ -4,7 +4,7 @@ print(typeof(R1)); println(" R1 = " + R1)
 let R2 = seq([
     let d = println("This"), // Now supporting comments!
     let d = "is", println(d),
-    let d = ^d - 9, println(d), println("test"), d
+    let d = ^d - 8, println(d), println("test"), d
 ])
 print(typeof(R2)); println(" R2 = " + R2)
 
