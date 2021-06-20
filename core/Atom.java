@@ -146,7 +146,13 @@ public abstract class Atom {
         }
 
         if ((this instanceof Val) && (rhs instanceof Val)) {
-            return (Atom) new Val(((Val) this).val + ((Val) rhs).val);
+            return new Val(((Val) this).val + ((Val) rhs).val);
+        }  else if (this instanceof Char && rhs instanceof Val) {
+            char c = ((Char)this).val;
+            int ci = (int)c;
+            int ad = ((Val)rhs).val;
+            char res = (char)(ci + ad);
+            return new Char(res);
         } else if (this instanceof Str && rhs instanceof Str) {
             return new Atom.Str(((Str)this).getStringValue() + ((Str)rhs).getStringValue());
         } else if (this instanceof Str && !(rhs instanceof List)) { // Str is List
@@ -162,14 +168,20 @@ public abstract class Atom {
             newList.list.addAll(lArr.list);
             newList.list.addAll(rArr.list);
             if (newList.isCharArray()) return new Atom.Str(newList.getStringValue());
-            return (Atom) newList;
+            return newList;
         }
         throw new Exception("Badd");
     }
 
     public Atom sub(Atom rhs) throws Exception {
         if ((this instanceof Val) && (rhs instanceof Val)) {
-            return (Atom) new Val(((Val) this).val - ((Val) rhs).val);
+            return new Val(((Val) this).val - ((Val) rhs).val);
+        } else if (this instanceof Char && rhs instanceof Val) {
+            char c = ((Char)this).val;
+            int ci = (int)c;
+            int rm = ((Val)rhs).val;
+            char res = (char)(ci - rm);
+            return new Char(res);
         } else {
             throw new Exception("Bad Sub");
         }
