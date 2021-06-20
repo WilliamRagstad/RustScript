@@ -55,11 +55,18 @@ public class Parser {
             return false;
         }
     }
+    
+    private String error(Token at, String message) {
+        return "Error at line " + at.line + " column " + at.column + ":\n\t" + message;
+    }
+    private String error(Token start, Token end, String message) {
+        return "Error from line " + start.line + " column " + start.column + " to line " + end.line + " column " + end.column + ":\n\t" + message;
+    }
 
     private void assertNext(TokenTy expected) throws Exception {
         var nx = eat();
         if (nx.ty != expected) {
-            throw new Exception(String.format("Expected %s, got %s", expected.toString(), nx.toString()));
+            throw new Exception(error(nx, String.format("Expected %s, got %s", expected.toString(), nx.toString())));
         }
     }
 
@@ -85,7 +92,7 @@ public class Parser {
 
                 Token ident = eat();
                 if (ident.ty != TokenTy.Ident) {
-                    throw new Exception("Invalid list comp, expected an identifier after 'for'.");
+                    throw new Exception(error(ident, "Invalid list comp, expected an identifier after 'for'."));
                 }
 
                 String name = ident.lexeme;
@@ -171,7 +178,7 @@ public class Parser {
     private Expr parseLetExpr(Token nx) throws Exception {
         Token ident = eat();
         if (ident.ty != TokenTy.Ident) {
-            throw new Exception("Invalid let expression");
+            throw new Exception(error(ident, "Invalid let expression"));
         }
 
         assertNext(TokenTy.Assign);
@@ -193,7 +200,7 @@ public class Parser {
             do {
                 Token nx = eat();
                 if (nx.ty != TokenTy.Ident) {
-                    throw new Exception(String.format("Unexpected %s", nx.toString()));
+                    throw new Exception(error(nx, String.format("Unexpected %s", nx.toString())));
                 }
                 argNames.add(nx.lexeme);
             } while (expect(TokenTy.Comma));
@@ -255,6 +262,7 @@ public class Parser {
             default -> {
                 if (allowEOF && nx.ty == TokenTy.EOF) yield new Expr.AtomicExpr(new Atom.Unit(), s, s+1);
                 else throw new Exception(String.format("Expected an expression, found: %s", nx.toString()));
+                else throw new Exception(error(nx, String.format("Expected an expression, found: %s", nx.toString())));
             }
         };
 
@@ -294,6 +302,7 @@ public class Parser {
         return lhs;
     }
 
+            else if (n.ty != TokenTy.SColon || n.ty != TokenTy.NL) throw new Exception(error(n, "Unexpected end of expression! Must have an ending ';' or newline till next expression."));
     public static Expr parseExpr(String input) throws Exception {
         ArrayList<Token> tokens = Tokenizer.tokenize(input);
         Parser p = new Parser(tokens);

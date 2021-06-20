@@ -13,18 +13,20 @@ package core;
 public class Token {
     TokenTy ty;
     String lexeme;
-    int index;
+    int index, line, column;
     int length;
 
-    public Token(TokenTy ty, String lexeme, int startIndex, int endIndex) {
+    public Token(TokenTy ty, String lexeme, int index, int length, int line, int col) {
         this.ty = ty;
         this.lexeme = lexeme;
         this.index = index;
         this.length = length;
+        this.line = line;
+        this.column = col;
     }
 
-    public static Token EOF(int index) {
-        return new Token(TokenTy.EOF, null, index, 1);
+    public static Token EOF(int index, int line, int col) {
+        return new Token(TokenTy.EOF, null, index, 1, line, col);
     }
 
     public String toString() {
