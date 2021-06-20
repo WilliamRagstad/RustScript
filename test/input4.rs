@@ -11,3 +11,14 @@ print(typeof(R2)); println(" R2 = " + R2)
 // Bool parsing
 let getBool = fn(s) => if (^lower(s) == 't') then substr(s, 0, 4) else substr(s, 0, 5)
 println(getBool("truethis")); println(getBool("falsethis"))
+
+
+println([
+    1,
+    2,
+    3,
+    4
+]); let
+a=
+10
+println (a)
