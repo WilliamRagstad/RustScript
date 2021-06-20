@@ -146,25 +146,6 @@ public class Interpreter {
             System.out.println(res.toString());
         }
     }
-    
-    // public ArrayList<Atom> evalAll(String expr) throws Exception {
-    //     ArrayList<Expr> expressions = new ArrayList<>();
-    //     Expr tmp;
-    //     while(true) {
-    //         expr = expr.trim();
-    //         if (expr.equals("")) break;
-    //         tmp = Parser.parseExpr(expr);
-    //         expressions.add(tmp);
-    //         if (tmp.endIndex == -1) break;
-    //         expr = expr.substring(tmp.endIndex);
-    //     }
-
-    //     ArrayList<Atom> results = new ArrayList<>();
-    //     for (Expr e : expressions) {
-    //         results.add(e.eval(globals, program));
-    //     }
-    //     return results;
-    // }
 
     /**
      * This method evaluates all expressions and returns the last expressions value.
@@ -181,6 +162,15 @@ public class Interpreter {
         Atom[] ret = new Atom[results.size()];
         ret = results.toArray(ret);
         return ret;
+    }
+    
+    public void executeAll(String program) throws Exception {
+        Atom[] res = evalAll(program);
+        if (res.length == 0) return;
+        Atom lst = res[res.length - 1];
+        if (!(lst instanceof Atom.Unit)) {
+            System.out.println(lst.toString());
+        }
     }
 }
 
