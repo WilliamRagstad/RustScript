@@ -7,10 +7,9 @@
     </p>
 </div>
 
-![GitHub all releases](https://img.shields.io/github/downloads/WilliamRagstad/RustScript/total?style=flat-square) <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+![visitors](https://visitor-badge.glitch.me/badge?page_id=WilliamRagstad.RustScript) ![GitHub all releases](https://img.shields.io/github/downloads/WilliamRagstad/RustScript/total?style=flat-square) <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
-
 
 
 ## Usage
