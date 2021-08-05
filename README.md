@@ -44,7 +44,7 @@ jar -cvmf manifest.txt RustScript.jar *.class core/*.class
 
 
 
-### Examples
+## Examples
 
 The following examples are created using the interactive REPL.
 
