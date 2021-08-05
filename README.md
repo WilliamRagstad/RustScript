@@ -1,8 +1,6 @@
 <div>
     <h1>
-        <img src="assets/emblem.png" width="45">
-        RustScript
-        <img src="assets/dagger.png" width="45">
+        <img src="assets/logo.png" height="90">
     </h1>
     <p>
         RustScript is a scripting language with as much relation to Rust as JavaScript has to Java.
