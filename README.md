@@ -20,20 +20,26 @@ There are global variables though.
 
 
 
-### Build
+> ## 📥 Install
+>
+> [Download](https://github.com/WilliamRagstad/RustScript/releases/latest/download/RustScript.jar) the latest version, or [view all releases](https://github.com/WilliamRagstad/RustScript/releases).
 
-Run the command below to build the `Runner.java` class into a standalone executable.
 
-```shell
-jar -cvmf manifest.txt RustScript.jar *.class core/*.class
-```
 
-### Run
+### 🔌Run
 
 Run a script using the following command.
 
 ```shell
 java -jar RustScript.jar <script>
+```
+
+### 🔨 Build
+
+If you want to build RustScript on your own, run the command below to build the `Runner.java` class into a standalone executable.
+
+```shell
+jar -cvmf manifest.txt RustScript.jar *.class core/*.class
 ```
 
 
