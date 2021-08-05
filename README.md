@@ -24,7 +24,7 @@ There are global variables though.
 
 > ## 📥 Install
 >
-> [Download](https://github.com/WilliamRagstad/RustScript/releases/latest/download/RustScript.jar) the latest version, or [view all releases](https://github.com/WilliamRagstad/RustScript/releases).
+> [Download](https://github.com/WilliamRagstad/RustScript/releases/latest/download/rsc.jar) the latest version, or [view all releases](https://github.com/WilliamRagstad/RustScript/releases).
 
 
 
