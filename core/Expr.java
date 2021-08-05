@@ -183,6 +183,74 @@ public abstract class Expr {
 		}
 	}
 
+	public static class MatchExpr extends Expr {
+		Expr value;
+		ArrayList<MatchCaseExpr> cases;
+
+		public Atom eval(HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
+			for (MatchCaseExpr matchCase : cases) {
+				Atom.MatchCaseResult matchCaseResult = (Atom.MatchCaseResult) matchCase.eval(variables, program);
+				if (matchCaseResult.isMatch()) {
+					return matchCaseResult.getClauseValue();
+				}
+			}
+			throw new Exception("No match found for value: " + value.toString());
+		}
+
+		public MatchExpr(Expr value, ArrayList<MatchCaseExpr> cases, int startIndex, int endIndex) {
+			super(startIndex, endIndex);
+			this.value = value;
+			this.cases = cases;
+		}
+
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			sb.append(String.format("match (%s)", value.toString()));
+			for (MatchCaseExpr matchCase : cases) {
+				sb.append(String.format("   %s", matchCase.toString()));
+			}
+			return sb.toString();
+		}
+	}
+
+	public static class MatchCaseExpr extends Expr {
+		Expr value;
+		String pattern;
+		Expr constraint;
+		Expr clause;
+
+		public Atom eval(HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
+			HashMap<String, Atom> clauseVariables = new HashMap<String, Atom>(variables);
+			clauseVariables.put(pattern, value.eval(variables, program));
+			if (constraint == null) {
+				return Atom.MatchCaseResult.matched(clause.eval(clauseVariables, program));
+			} else {
+				Atom constraintResult = constraint.eval(clauseVariables, program);
+				if (constraintResult.isTruthy()) {
+					return Atom.MatchCaseResult.matched(clause.eval(clauseVariables, program));
+				} else {
+					return Atom.MatchCaseResult.noMatch();
+				}
+			}
+		}
+
+		public MatchCaseExpr(Expr value, String pattern, Expr constraint, Expr clause, int startIndex, int endIndex) {
+			super(startIndex, endIndex);
+			this.value = value;
+			this.pattern = pattern;
+			this.constraint = constraint;
+			this.clause = clause;
+		}
+
+		public String toString() {
+			String constrainedPattern = String.format("%s", pattern);
+			if (constrainedPattern != null) {
+				constrainedPattern = String.format("%s and %s", pattern, constraint.toString());
+			}
+			return String.format("got (%s) then (%s)", constrainedPattern, clause.toString());
+		}
+	}
+
 	public static class LambdaCall extends Expr {
 		String name;
 		ArrayList<Expr> variables;

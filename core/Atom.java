@@ -134,6 +134,32 @@ public abstract class Atom {
 		}
 	}
 
+	public static class MatchCaseResult extends Atom {
+		private boolean matched;
+		private Atom value;
+
+		private MatchCaseResult(boolean matched, Atom value) {
+			this.matched = matched;
+			this.value = value;
+		}
+
+		public static MatchCaseResult matched(Atom value) {
+			return new MatchCaseResult(true, value);
+		}
+
+		public static MatchCaseResult noMatch() {
+			return new MatchCaseResult(false, null);
+		}
+
+		public boolean isMatch() {
+			return matched;
+		}
+
+		public Atom getClauseValue() {
+			return value;
+		}
+	}
+
 	public static class Unit extends Atom {
 
 		public Unit() {

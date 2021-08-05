@@ -86,6 +86,9 @@ public class Tokenizer {
 			case "in" -> addToken(TokenTy.In, lexeme);
 			case "true" -> addToken(TokenTy.True, lexeme);
 			case "false" -> addToken(TokenTy.False, lexeme);
+			case "match" -> addToken(TokenTy.Match, lexeme);
+			case "got" -> addToken(TokenTy.Got, lexeme);
+			case "and" -> addToken(TokenTy.GotAnd, lexeme);
 			default -> addToken(TokenTy.Ident, lexeme);
 		}
 	}
@@ -255,9 +258,14 @@ public class Tokenizer {
 			}
 			case '\n' -> addToken(TokenTy.NL, c);
 			default -> {
-				if (Character.isWhitespace(c))
+				if (Character.isWhitespace(c)) {
+					if (c == '\t') {
+						column += 4; // tabs are 4 spaces
+					} else {
+						column++;
+					}
 					addNextToken();
-				else if (Character.isAlphabetic(c) || c == '_') {
+				} else if (Character.isAlphabetic(c) || c == '_') {
 					position -= 1;
 					scanIdent();
 				} else if (Character.isDigit(c)) {

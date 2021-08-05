@@ -1,8 +1,9 @@
 package core;
+
 /**
  * @author Mikail Khan <mikail@mikail-khan.com>
  * @version 0.1.0
- * 
+ *
  *          A token
  *
  *          <p>
@@ -11,55 +12,55 @@ package core;
  *          </p>
  */
 public class Token {
-    TokenTy ty;
-    String lexeme;
-    int index, line, column;
-    int length;
+	TokenTy ty;
+	String lexeme;
+	int index, line, column;
+	int length;
 
-    public Token(TokenTy ty, String lexeme, int index, int length, int line, int col) {
-        this.ty = ty;
-        this.lexeme = lexeme;
-        this.index = index;
-        this.length = length;
-        this.line = line;
-        this.column = col;
-    }
+	public Token(TokenTy ty, String lexeme, int index, int length, int line, int col) {
+		this.ty = ty;
+		this.lexeme = lexeme;
+		this.index = index;
+		this.length = length;
+		this.line = line;
+		this.column = col;
+	}
 
-    public static Token EOF(int index, int line, int col) {
-        return new Token(TokenTy.EOF, null, index, 1, line, col);
-    }
+	public static Token EOF(int index, int line, int col) {
+		return new Token(TokenTy.EOF, null, index, 1, line, col);
+	}
 
-    public String toString() {
-        return switch (ty) {
-            case Ident -> String.format("Ident '%s'", lexeme);
-            case Number -> String.format("Number %s", lexeme);
-            default -> String.format("%s", ty.toString());
-        };
-    }
+	public String toString() {
+		return switch (ty) {
+			case Ident -> String.format("Ident '%s'", lexeme);
+			case Number -> String.format("Number %s", lexeme);
+			default -> String.format("%s", ty.toString());
+		};
+	}
 }
 
 enum TokenTy {
-    LParen, RParen,
+	LParen, RParen,
 
-    LBracket, RBracket,
+	LBracket, RBracket,
 
-    Ident, Number, Character, String, True, False,
+	Ident, Number, Character, String, True, False,
 
-    Add, Sub, Mul, Div, Mod,
+	Add, Sub, Mul, Div, Mod,
 
-    EQ, LT, GT, NEQ,
+	EQ, LT, GT, NEQ,
 
-    And, Or,
+	And, Or,
 
-    If, Then, Else,
+	If, Then, Else, Match, Got, GotAnd,
 
-    Let, Assign, Comma,
+	Let, Assign, Comma,
 
-    Caret, Dollar,
+	Caret, Dollar,
 
-    Fn, Arrow,
+	Fn, Arrow,
 
-    For, In, DotDot,
+	For, In, DotDot,
 
-    SColon, NL, EOF
+	SColon, NL, EOF
 }
