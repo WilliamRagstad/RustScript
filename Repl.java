@@ -1,5 +1,4 @@
 import java.util.Scanner;
-import java.nio.charset.StandardCharsets;
 import java.util.NoSuchElementException;
 
 /**

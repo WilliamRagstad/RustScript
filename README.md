@@ -1,13 +1,14 @@
 <div>
     <h1>
-        <img src="assets/emblem.png" width="60">
+        <img src="assets/emblem.png" width="45">
         RustScript
-        <img src="assets/dagger.png" width="60">
+        <img src="assets/dagger.png" width="45">
     </h1>
     <p>
         RustScript is a scripting language with as much relation to Rust as JavaScript has to Java.
     </p>
 </div>
+
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
