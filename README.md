@@ -6,10 +6,10 @@
         RustScript is a scripting language with as much relation to Rust as JavaScript has to Java.
     </p>
 </div>
-
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
+![GitHub all releases](https://img.shields.io/github/downloads/WilliamRagstad/RustScript/total?style=flat-square)
 
 
 
