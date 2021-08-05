@@ -12,9 +12,33 @@
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 
+
 ## Usage
 
-This is an expression based language; everything is an expression. There are global variables though.
+RustScript is an expression based language; everything is an expression.
+There are global variables though.
+
+
+
+### Build
+
+Run the command below to build the `Runner.java` class into a standalone executable.
+
+```shell
+jar -cvmf manifest.txt RustScript.jar *.class core/*.class
+```
+
+### Run
+
+Run a script using the following command.
+
+```shell
+java -jar RustScript.jar <script>
+```
+
+
+
+### Examples
 
 The following examples are created using the interactive REPL.
 
