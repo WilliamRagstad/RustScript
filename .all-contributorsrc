@@ -15,6 +15,17 @@
         "test",
         "code"
       ]
+    },
+    {
+      "login": "mkhan45",
+      "name": "Mikail Khan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/24574272?v=4",
+      "profile": "https://mikail-khan.com",
+      "contributions": [
+        "doc",
+        "test",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
