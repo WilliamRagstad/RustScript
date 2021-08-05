@@ -21,7 +21,6 @@ public class Interpreter {
 	public Interpreter() throws Exception {
 		globals = new HashMap<>();
 		program = new HashMap<>();
-
 		// load built-ins
 		loadProgram();
 	}
@@ -163,6 +162,13 @@ public class Interpreter {
 	public void clean() {
 		globals = new HashMap<>();
 		program = new HashMap<>();
+		// load built-ins
+		try {
+			loadProgram();
+		} catch (Exception e) {
+			// Exceptions cannot be thrown from the interpreter if we have gotten to this
+			// point.
+		}
 	}
 
 	public Atom eval(String expr) throws Exception {
