@@ -186,6 +186,11 @@ square(sum([1..100])) - (sum(fmap(square, [1..100])))
 ```
 > Once again the numbers are too big
 
+## Logo Credits
+
+The logo was modified from an image by [Smashicons](https://smashicons.com/) on [Flaticon](https://www.flaticon.com). The original images can be found [here](https://www.flaticon.com/search?word=rusty&style=all&order_by=4&type=icon) or in the [assets](https://github.com/WilliamRagstad/RustScript/tree/main/assets) folder.
+
+
 ## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
