@@ -1,4 +1,5 @@
-    let     a =     10
+// Test code formatting and types
+let     a =     10
      println(   a )
      let val = input("Enter text: ")
     println(2 *   2)

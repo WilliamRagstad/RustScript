@@ -1,3 +1,4 @@
+// This tests code formatting and structure robustness.
 let R1 = seq([let d = "ThisIsNice", let d = substr(d, 6, 10), d + " weather"])
 print(typeof(R1)); println(" R1 = " + R1)
 

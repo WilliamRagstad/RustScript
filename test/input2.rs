@@ -1,3 +1,4 @@
+// Test strings and built in types
 let s = "Hej"
 println(typeof(s))
 let s = s + "!"
