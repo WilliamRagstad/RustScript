@@ -12,8 +12,18 @@ import java.util.NoSuchElementException;
  *          language and run commands as you go.
  */
 public class Repl {
-	public static void main(String[] args) throws Exception {
-		Interpreter i = new Interpreter();
+	public static void main(String[] args) {
+		run();
+	}
+
+	public static void run() {
+		Interpreter i;
+		try {
+			i = new Interpreter();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return;
+		}
 		Scanner sc = new Scanner(System.in, getSupportedCharset());
 		for (;;) {
 			try {

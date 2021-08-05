@@ -21,8 +21,18 @@ public class Runner {
 			System.out.println("Usage: Runner [file(s)]");
 			return;
 		}
+
+	}
+
+	public static void run(String[] files) {
 		Interpreter i;
-		for (String file : args) {
+		try {
+			i = new Interpreter();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return;
+		}
+		for (String file : files) {
 			String source;
 			try {
 				source = Files.readString(Paths.get(file), StandardCharsets.UTF_8);
@@ -30,7 +40,7 @@ public class Runner {
 				e.printStackTrace();
 				continue;
 			}
-			i = new Interpreter(); // New environment for each file.
+			i.clean(); // New environment for each file.
 			try {
 				i.evalAll(source); // Discard last the expressions value
 			} catch (Exception e) {
