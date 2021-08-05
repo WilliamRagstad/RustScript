@@ -156,6 +156,15 @@ public class Interpreter {
 		execute("let has = fn(val) => typeof(val) != \"Unit\"");
 	}
 
+	/**
+	 * Clean the interpreter state and start fresh. The interpreter can then be
+	 * reused for running a new program.
+	 */
+	public void clean() {
+		globals = new HashMap<>();
+		program = new HashMap<>();
+	}
+
 	public Atom eval(String expr) throws Exception {
 		return Parser.parseExpr(expr).eval(globals, program);
 	}
