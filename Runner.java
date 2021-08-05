@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -33,6 +34,17 @@ public class Runner {
 			return;
 		}
 		for (String file : files) {
+			File f = new File(file);
+			if (!f.exists()) {
+				System.out.println("File '" + file + "' does not exist.");
+				return;
+			} else if (f.isDirectory()) {
+				System.out.println("File '" + file + "' is a directory.");
+				return;
+			} else if (!f.canRead()) {
+				System.out.println("File '" + file + "' is not readable.");
+				return;
+			}
 			String source;
 			try {
 				source = Files.readString(Paths.get(file), StandardCharsets.UTF_8);
@@ -40,12 +52,13 @@ public class Runner {
 				e.printStackTrace();
 				continue;
 			}
-			i.clean(); // New environment for each file.
 			try {
 				i.evalAll(source); // Discard last the expressions value
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
+				return;
 			}
+			i.clean(); // New environment for each file.
 		}
 	}
 }
