@@ -74,6 +74,13 @@ ls // [1, 2, 9, 4, 5, 2, 4, 6, 8]
 $ls // [2, 9, 4, 5, 2, 4, 6, 8]
 ```
 
+### Characters and Strings
+
+```rust
+let capC = 'C'
+"Cool!" == [capC, 'o', 'o', 'l', '!'] // true
+```
+
 ### Ranges
 
 ```rust
