@@ -62,6 +62,14 @@ let x = 5
 x * 15 // 75
 ```
 
+### Booleans
+
+```rust
+true != false // true
+-true // false
+-((true && false) || true) // false
+```
+
 ### Lists
 
 ```rust
@@ -79,6 +87,16 @@ $ls // [2, 9, 4, 5, 2, 4, 6, 8]
 ```rust
 let capC = 'C'
 "Cool!" == [capC, 'o', 'o', 'l', '!'] // true
+
+'A' + 2 // 'C'
+'B' - 1 // 'A'
+'A' > 'B' // false
+
+"Hello" + '!' // "Hello!"
+
+"Hello, " + "world!" // "Hello, world!"
+
+"Hi" + [65, 10] // ['H', 'i', 65, 10]
 ```
 
 ### Ranges
