@@ -178,7 +178,7 @@ It's worth noting that `factor` doubles as `is_prime`, since it returns false fo
 ```hs
 let square = fn (x) => x * x
 square(sum([1..100])) - (sum(fmap(square, [1..100])))
-``
+```
 
 Once again the numbers are too big
 
