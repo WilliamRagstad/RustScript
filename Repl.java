@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.nio.charset.StandardCharsets;
 import java.util.NoSuchElementException;
 
 /**
@@ -9,9 +10,9 @@ import java.util.NoSuchElementException;
  *          language and run commands as you go.
  */
 public class Repl {
-        Scanner sc = new Scanner(System.in); // Does not support unicode (e.g å, ä, ö)
 	public static void main(String[] args) throws Exception {
 		Interpreter i = new Interpreter();
+		Scanner sc = new Scanner(System.in, getSupportedCharset());
 		for (;;) {
 			try {
 				System.out.print("> ");
@@ -24,6 +25,15 @@ public class Repl {
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
 			}
+		}
+	}
+
+	private static String getSupportedCharset() {
+		switch (System.getProperty("os.name")) {
+			case "Windows 10":
+				return "Cp850";
+			default:
+				return "UTF-8";
 		}
 	}
 }

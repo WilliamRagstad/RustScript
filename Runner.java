@@ -1,5 +1,5 @@
-                source = Files.readString(Paths.get(file));
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -23,6 +23,7 @@ public class Runner {
 		for (String file : args) {
 			String source;
 			try {
+				source = Files.readString(Paths.get(file), StandardCharsets.UTF_8);
 			} catch (IOException e) {
 				e.printStackTrace();
 				continue;
