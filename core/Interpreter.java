@@ -1,9 +1,8 @@
+package core;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
-import java.util.function.Function;
-
-import core.*;
 
 /**
  * @author Mikail Khan <mikail@mikail-khan.com> & William Rågstad

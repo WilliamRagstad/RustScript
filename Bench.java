@@ -1,3 +1,5 @@
+import core.Interpreter;
+
 public class Bench {
 	public static void main(String[] args) throws Exception {
 		Interpreter i = new Interpreter();

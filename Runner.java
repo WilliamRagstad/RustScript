@@ -3,6 +3,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import core.Interpreter;
+
 /**
  * @author William Rågstad <william.ragstad@gmail.com>
  * @version 0.1.0
