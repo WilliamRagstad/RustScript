@@ -45,7 +45,7 @@ If you want to build RustScript on your own, run the command below to build the 
 jar -cvmf manifest.txt rsc.jar *.class core/*.class
 ```
 
-
+---
 
 ## Examples
 
@@ -170,6 +170,8 @@ fmap(fib, [5..10] + [3, 2])
 > product([1..10])
 // 362880
 ```
+
+---
 
 ### Project Euler
 
