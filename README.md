@@ -14,13 +14,13 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-
+<br>
 
 > ## 📥 Install
 >
 > [Download](https://github.com/WilliamRagstad/RustScript/releases/latest/download/rsc.jar) the latest version of the RustScript CLI tool `rsc`, or [view all releases](https://github.com/WilliamRagstad/RustScript/releases).
 
-
+<br>
 
 ## Usage
 
@@ -253,9 +253,19 @@ square(sum([1..100])) - (sum(fmap(square, [1..100])))
 The logo is a modified image by [Smashicons](https://smashicons.com/) from [Flaticon](https://www.flaticon.com). The original images can be found [here](https://www.flaticon.com/search?word=rusty&style=all&order_by=4&type=icon) or in the [assets](https://github.com/WilliamRagstad/RustScript/tree/main/assets) folder.
 
 
+## Community
+The RustScript language is developed by a group of volunteers. To further support the project, we welcome any and all **feedback**, **contributions** and **engagement**!
+
+* ### Join our discord server: https://discord.gg/qCc35JFCzZ
+
+* ### Contrubute code or documentation: https://github.com/WilliamRagstad/RustScript
+
+* ### Sponsor the project: https://github.com/sponsors/WilliamRagstad
+
+* ### Donate: https://www.paypal.com/paypalme/williamragstad
 
 
-## Contributors ✨
+## ✨ Contributors
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
