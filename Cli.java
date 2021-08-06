@@ -28,10 +28,10 @@ public class Cli {
 					Prints the version of the program.
 				-r, --repl
 					Starts the REPL mode.
+				-l, --lint [files]
+					Lints the given files.
 				-c, --compile [files]          (Not implemented)
 					Compiles the given files.
-				-l, --lint [files]             (Not implemented)
-					Lints the given files.
 
 			Execute scripts: rsc [files]
 				Interprets the given script files one at a time.
@@ -39,22 +39,32 @@ public class Cli {
 			%s""", VERSION, DESCRIPTION, COPYRIGHT);
 
 	public static void main(String[] args) {
-		List<String> argsList = Arrays.asList(args).stream()
-				.map((String option) -> option.startsWith("-") ? option.toLowerCase() : option).toList();
-		if (argsList.contains("--help") || argsList.contains("-h")) {
+		List<String> options = Arrays.asList(args).stream()
+			.filter(arg -> arg.startsWith("-"))
+			.map(String::toLowerCase).toList();
+		List<String> files = Arrays.asList(args).stream()
+			.filter(arg -> !arg.startsWith("-")).toList();
+		if (options.contains("--help") || options.contains("-h")) {
 			System.out.println(HELP);
-		} else if (argsList.contains("--version") || argsList.contains("-v")) {
+		} else if (options.contains("--version") || options.contains("-v")) {
 			System.out.println(VERSION);
-		} else if (argsList.contains("--repl") || argsList.contains("-r")) {
+		} else if (options.contains("--repl") || options.contains("-r")) {
 			Repl.run();
+		} else if (options.contains("--lint") || options.contains("-l")) {
+			if (files.isEmpty()) {
+				System.out.println("No files given.");
+			} else {
+				Linter.run(files);
+			}
 		} else {
-			if (argsList.size() > 0) {
-				if (argsList.stream().anyMatch((String option) -> option.startsWith("-"))) {
-					// Unknown option found
-					System.out.println("Unknown option");
+			if (args.length > 0) {
+				if (options.size() == 1) {
+					System.out.println(String.format("Error: Unknown option '%s'", options.get(0)));
+				} else if (options.size() > 1) {
+					System.out.println(String.format("Error: Unknown options '%s'", String.join("', '", options)));
 				} else {
 					// All args are files
-					Runner.run(args);
+					Runner.run(files);
 				}
 			} else {
 				System.out.println(HELP);

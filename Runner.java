@@ -3,6 +3,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 
 import core.Interpreter;
 
@@ -22,10 +24,10 @@ public class Runner {
 			System.out.println("Usage: Runner [file(s)]");
 			return;
 		}
-
+        run(Arrays.asList(args));
 	}
 
-	public static void run(String[] files) {
+    public static void run(List<String> files) {
 		Interpreter i;
 		try {
 			i = new Interpreter();

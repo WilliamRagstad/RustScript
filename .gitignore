@@ -3,3 +3,4 @@
 .project
 .settings/org.eclipse.jdt.core.prefs
 *.jar
+.all-contributorsrc
