@@ -26,6 +26,7 @@
 
 ### 🔌Run
 
+See CLI user manual/help by running `rsc` with the `--help` or `-h` options.
 Run a script using the following command.
 
 ```shell
