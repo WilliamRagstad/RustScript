@@ -15,16 +15,17 @@
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 
-## Usage
-
-RustScript is an expression based language; everything is an expression.
-There are global variables though.
-
-
 
 > ## 📥 Install
 >
 > [Download](https://github.com/WilliamRagstad/RustScript/releases/latest/download/rsc.jar) the latest version of the RustScript CLI tool `rsc`, or [view all releases](https://github.com/WilliamRagstad/RustScript/releases).
+
+
+
+## Usage
+
+RustScript is an expression based language; everything is an expression.
+There are global variables though.
 
 
 
