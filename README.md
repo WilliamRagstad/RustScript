@@ -123,7 +123,31 @@ let apply_twice = fn (f, x) => f(f(x))
 apply_twice(f, 5) // 20
 ```
 
+### Lambda variations
+
+```rust
+let x = fn() => 2
+x
+// Lambda [
+//         {argNames: [], expr: 2}
+// ]
+
+var x = fn(y) => y
+x
+// Lambda [
+//         {argNames: [], expr: 2}
+//         {argNames: [y], expr: "y"}
+// ]
+
+x() // 2
+x(6) // 6
+
+var x = fn(y) => y
+// Error: Lambda already has a variation with arity 1
+```
+
 ### Conditionals
+
 ```rust
 if (3 < 5) then (4) else (3)
 // 4
