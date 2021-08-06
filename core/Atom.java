@@ -205,10 +205,10 @@ public abstract class Atom {
 			return new Atom.Str(((Str) this).getStringValue() + ((Str) rhs).getStringValue());
 		} else if (this instanceof Str && !(rhs instanceof List)) { // Str is List
 			String value = ((Atom.Str) this).getStringValue();
-			if (rhs instanceof Integer || rhs instanceof Bool)
-				return new Atom.Str(value + rhs.toString());
-			else if (rhs instanceof Char)
+			if (rhs instanceof Char) {
 				return new Atom.Str(value + ((Atom.Char) rhs).val);
+			}
+			return new Atom.Str(value + rhs.toString());
 			// else Badd
 		} else if ((this instanceof List) && (rhs instanceof List)) {
 			List lArr = (List) this;
