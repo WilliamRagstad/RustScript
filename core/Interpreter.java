@@ -160,8 +160,8 @@ public class Interpreter {
 	 * reused for running a new program.
 	 */
 	public void clean() {
-		globals = new HashMap<>();
-		program = new HashMap<>();
+		globals.clear();
+		program.clear()
 		// load built-ins
 		try {
 			loadProgram();
