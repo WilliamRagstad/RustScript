@@ -161,7 +161,7 @@ public class Interpreter {
 	 */
 	public void clean() {
 		globals.clear();
-		program.clear()
+		program.clear();
 		// load built-ins
 		try {
 			loadProgram();
