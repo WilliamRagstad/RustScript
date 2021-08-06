@@ -24,11 +24,6 @@
 
 ## Usage
 
-RustScript is an expression based language; everything is an expression.
-There are global variables though.
-
-
-
 ### 🔌Run
 
 Run a script using the following command.
@@ -48,6 +43,8 @@ jar -cvmf manifest.txt rsc.jar *.class core/*.class
 ---
 
 ## Examples
+
+RustScript is an expression based language; **everything is an expression**.
 
 The following examples are created using the interactive REPL.
 
