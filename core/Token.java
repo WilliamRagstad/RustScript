@@ -54,7 +54,7 @@ enum TokenTy {
 
 	If, Then, Else, Match, Got, GotAnd,
 
-	Let, Assign, Comma,
+	Let, Assign, Variation, Comma,
 
 	Caret, Dollar,
 

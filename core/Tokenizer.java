@@ -80,6 +80,7 @@ public class Tokenizer {
 			case "then" -> addToken(TokenTy.Then, lexeme);
 			case "else" -> addToken(TokenTy.Else, lexeme);
 			case "let" -> addToken(TokenTy.Let, lexeme);
+			case "var" -> addToken(TokenTy.Variation, lexeme);
 			case "fn" -> addToken(TokenTy.Fn, lexeme);
 			case "for" -> addToken(TokenTy.For, lexeme);
 			case "in" -> addToken(TokenTy.In, lexeme);

@@ -2,6 +2,9 @@ package core;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+
+import core.Atom.Lambda.LambdaVariation;
 
 /**
  * @author Mikail Khan <mikail@mikail-khan.com>
@@ -278,18 +281,19 @@ public abstract class Expr {
 
 		public Atom evalLambda(Atom.Lambda lambda, HashMap<String, Atom> evaledVariables,
 				HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
-			ArrayList<String> argNames = lambda.argNames;
+			for (Map.Entry<java.lang.Integer, LambdaVariation> lambdaVariation : lambda.variations.entrySet()) {
+				int arity = lambdaVariation.getKey();
 
-			if (this.variables.size() != lambda.argNames.size()) {
-				throw new Exception(String.format("Expected %d arguments to call of lambda %s, got %d",
-						lambda.argNames.size(), name, this.variables.size()));
+				if (this.variables.size() == arity) {
+					LambdaVariation variation = lambdaVariation.getValue();
+					ArrayList<String> argNames = variation.argNames;
+					for (int i = 0; i < argNames.size(); i += 1) {
+						evaledVariables.put(argNames.get(i), this.variables.get(i).eval(variables, program));
+					}
+					return variation.expr.eval(evaledVariables, program);
+				}
 			}
-
-			for (int i = 0; i < argNames.size(); i += 1) {
-				evaledVariables.put(argNames.get(i), this.variables.get(i).eval(variables, program));
-			}
-
-			return lambda.expr.eval(evaledVariables, program);
+			throw new Exception(String.format("Could not find function variation matching %s/%s.", name, this.variables.size()));
 		}
 
 		public LambdaCall(String name, int startIndex, int endIndex) {
@@ -342,6 +346,43 @@ public abstract class Expr {
 
 		public String toString() {
 			return String.format("let %s = %s", lhs, rhs.toString());
+		}
+	}
+
+	public static class VariationExpr extends Expr {
+		String lhs;
+		Expr rhs;
+
+		public Atom eval(HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
+			Atom variationValue = rhs.eval(variables, program);
+			if (variationValue instanceof Atom.Lambda) {
+				if (variables.containsKey(lhs)) {
+					// Add the new variation
+					Atom lambda = variables.get(lhs);
+					if (lambda instanceof Atom.Lambda) {
+						LambdaVariation lambdaVariation = ((Atom.Lambda)variationValue).variations.values().iterator().next();
+						((Atom.Lambda)lambda).addVariation(lambdaVariation.expr, lambdaVariation.argNames);
+					}
+					else {
+						throw new Exception("Cannot add variation to any other than functions");
+					}
+				} else {
+					throw new Exception(String.format("Tried to add variation to nonexistent variable %s", lhs));
+				}
+			} else {
+				throw new Exception("Variation value must be of type lambda expression");
+			}
+			return new Atom.Unit();
+		}
+
+		public VariationExpr(String lhs, Expr rhs, int startIndex, int endIndex) {
+			super(startIndex, endIndex);
+			this.lhs = lhs;
+			this.rhs = rhs;
+		}
+
+		public String toString() {
+			return String.format("var %s = %s", lhs, rhs.toString());
 		}
 	}
 

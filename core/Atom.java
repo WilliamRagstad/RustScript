@@ -132,16 +132,36 @@ public abstract class Atom {
 	}
 
 	public static class Lambda extends Atom {
-		public Expr expr;
-		public ArrayList<String> argNames;
+		public HashMap<java.lang.Integer, LambdaVariation> variations;
 
 		public Lambda(Expr expr, ArrayList<String> argNames) {
-			this.expr = expr;
-			this.argNames = argNames;
+			variations = new HashMap<java.lang.Integer, LambdaVariation>();
+			variations.put(argNames.size(), new LambdaVariation(expr, argNames));
+		}
+
+		public void addVariation(Expr expr, ArrayList<String> argNames) {
+			if (variations.containsKey(argNames.size())) {
+				throw new RuntimeException("Lambda already has a variation with arity " + argNames.size());
+			}
+			variations.put(argNames.size(), new LambdaVariation(expr, argNames));
 		}
 
 		public String toString() {
-			return String.format("Lambda {expr: %s, argNames: %s}", expr.toString(), argNames.toString());
+			return String.format("Lambda [\n\t%s\n]", String.join(",\n\t", variations.values().stream().map(LambdaVariation::toString).toList()));
+		}
+
+		public static class LambdaVariation {
+			public Expr expr;
+			public ArrayList<String> argNames;
+
+			public LambdaVariation(Expr expr, ArrayList<String> argNames) {
+				this.expr = expr;
+				this.argNames = argNames;
+			}
+
+			public String toString() {
+				return String.format("{argNames: %s, expr: %s}", argNames.toString(), expr.toString());
+			}
 		}
 	}
 

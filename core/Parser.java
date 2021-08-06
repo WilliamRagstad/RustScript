@@ -254,6 +254,19 @@ public class Parser {
 		return parseLetExpr(Token.EOF(position, line, column));
 	}
 
+	private Expr parseVariationExpr(Token nx) throws Exception {
+		Token ident = eat();
+		if (ident.ty != TokenTy.Ident) {
+			throw new Exception(error(ident, "Invalid var expression"));
+		}
+
+		assertNext(TokenTy.Assign);
+
+		Expr rhs = exprBP(0);
+
+		return new Expr.VariationExpr(ident.lexeme, rhs, nx.index, rhs.endIndex);
+	}
+
 	private Expr parseLambdaExpr(Token next) throws Exception {
 		assertNext(TokenTy.LParen);
 
@@ -307,6 +320,7 @@ public class Parser {
 			case Character -> new Expr.AtomicExpr(new Atom.Char(nx.lexeme.charAt(0)), s, s + nx.lexeme.length());
 			case String -> new Expr.AtomicExpr(new Atom.Str(nx.lexeme), s, s + nx.lexeme.length());
 			case Let -> parseLetExpr(nx);
+			case Variation -> parseVariationExpr(nx);
 			case Fn -> parseLambdaExpr(nx);
 			case If -> parseIfExpr(nx);
 			case Match -> parseMatchExpr(nx);
