@@ -58,7 +58,7 @@ public class Runner {
 				System.out.println(e.getMessage());
 				return;
 			}
-			i.clean(); // New environment for each file.
+			i.clear(); // New environment for each file.
 		}
 	}
 }
