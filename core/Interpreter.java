@@ -5,9 +5,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 /**
- * @author Mikail Khan <mikail@mikail-khan.com> & William Rågstad
- *         <william.ragstad@gmail.com>
- * @version 0.1.0
+ * @author Mikail Khan <mikail@mikail-khan.com>, William Rågstad <william.ragstad@gmail.com>
  *
  *          Because this is an expression based language we don't need to deal
  *          with complicated scoping and whatnot. This keeps the interpreter

@@ -3,8 +3,7 @@ package core;
 import java.util.ArrayList;
 
 /**
- * @author Mikail Khan <mikail@mikail-khan.com>
- * @version 0.1.0
+ * @author Mikail Khan <mikail@mikail-khan.com>, William Rågstad <william.ragstad@gmail.com>
  *
  *          The Tokenizer takes a String and turns it into a flat list of
  *          Tokens.

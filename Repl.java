@@ -5,8 +5,7 @@ import core.Interpreter;
 import java.util.NoSuchElementException;
 
 /**
- * @author William Rågstad <william.ragstad@gmail.com>
- * @version 0.1.0
+ * @author Mikail Khan <mikail@mikail-khan.com>, William Rågstad <william.ragstad@gmail.com>
  *
  *          The REPL program lets you interact with the RustScript programming
  *          language and run commands as you go.

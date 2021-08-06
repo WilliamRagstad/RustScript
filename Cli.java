@@ -3,7 +3,6 @@ import java.util.Arrays;
 
 /**
  * @author William Rågstad <william.ragstad@gmail.com>
- * @version 0.1.0
  *
  *          The CLI is a simple command line interface for the RustScript
  *          language. It provides a simple way to run RustScript script files
@@ -12,7 +11,7 @@ import java.util.Arrays;
  *          languages like JavaScript, C++ or Python.
  */
 public class Cli {
-	private static final String VERSION = "0.1.0";
+	private static final String VERSION = "2.1.0";
 	private static final String DESCRIPTION = "A command line interface tool for the RustScript language.";
 	private static final String COPYRIGHT = "Copyright (c) 2021 William Rågstad";
 	private static final String HELP = String.format("""

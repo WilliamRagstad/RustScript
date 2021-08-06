@@ -5,8 +5,7 @@ import java.util.ArrayList;
 import core.Expr.MatchCaseExpr;
 
 /**
- * @author Mikail Khan <mikail@mikail-khan.com>
- * @version 0.1.0
+ * @author Mikail Khan <mikail@mikail-khan.com>, William Rågstad <william.ragstad@gmail.com>
  *
  *          A Parser takes a String, tokenizes it using a Tokenizer, and then
  *          converts the flat list of tokens into a meaningful Expr AST which

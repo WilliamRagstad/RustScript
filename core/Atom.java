@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 /**
  * @author Mikail Khan <mikail@mikail-khan.com>
- * @version 0.1.0
  *
  *          An Atom is any discrete variable, literal or not
  *

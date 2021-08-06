@@ -10,7 +10,6 @@ import core.Interpreter;
 
 /**
  * @author William Rågstad <william.ragstad@gmail.com>
- * @version 0.1.0
  *
  *          The Runner takes a set of input source code files as command line
  *          argument, and interprets them by expression. Even if one file fails

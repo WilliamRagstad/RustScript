@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 /**
  * @author Mikail Khan <mikail@mikail-khan.com>
- * @version 0.1.0
  *
  *          An expression, the AST of this language.
  *
