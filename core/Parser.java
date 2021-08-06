@@ -291,7 +291,7 @@ public class Parser {
 		Expr lhs = switch (nx.ty) {
 			case True -> new Expr.AtomicExpr(new Atom.Bool(true), s, s + nx.lexeme.length());
 			case False -> new Expr.AtomicExpr(new Atom.Bool(false), s, s + nx.lexeme.length());
-			case Number -> new Expr.AtomicExpr(new Atom.Val(Integer.parseInt(nx.lexeme)), s, s + nx.lexeme.length());
+			case Number -> new Expr.AtomicExpr(new Atom.Integer(Integer.parseInt(nx.lexeme)), s, s + nx.lexeme.length());
 			case Ident -> {
 				if (peek().ty == TokenTy.LParen) {
 					ArrayList<Expr> vars = parseCallArgs();

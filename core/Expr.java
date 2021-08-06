@@ -353,27 +353,27 @@ public abstract class Expr {
 		HashMap<String, Atom> emptyScope = new HashMap<>();
 		HashMap<String, ProgramFunction> emptyProgram = new HashMap<>();
 
-		AtomicExpr e1 = new AtomicExpr(new Atom.Val(1));
-		assert ((Atom.Val) e1.eval(emptyScope, emptyProgram)).val == 1;
+		AtomicExpr e1 = new AtomicExpr(new Atom.Integer(1));
+		assert ((Atom.Integer) e1.eval(emptyScope, emptyProgram)).val == 1;
 
 		HashMap<String, Atom> piScope = new HashMap<>();
-		piScope.put("pi", new Atom.Val(3));
+		piScope.put("pi", new Atom.Integer(3));
 		AtomicExpr e2 = new AtomicExpr(new Atom.Ident("pi"));
-		assert ((Atom.Val) e2.eval(piScope, emptyProgram)).val == 3;
+		assert ((Atom.Integer) e2.eval(piScope, emptyProgram)).val == 3;
 
-		PrefixExpr e3 = new PrefixExpr(PrefixOp.Negate, new AtomicExpr(new Atom.Val(3)));
-		assert ((Atom.Val) e3.eval(emptyScope, emptyProgram)).val == -3;
+		PrefixExpr e3 = new PrefixExpr(PrefixOp.Negate, new AtomicExpr(new Atom.Integer(3)));
+		assert ((Atom.Integer) e3.eval(emptyScope, emptyProgram)).val == -3;
 
-		BinaryExpr e4 = new BinaryExpr(BinOp.Add, new Atom.Val(10), new Atom.Val(20));
-		assert ((Atom.Val) e4.eval(emptyScope, emptyProgram)).val == 30;
+		BinaryExpr e4 = new BinaryExpr(BinOp.Add, new Atom.Integer(10), new Atom.Integer(20));
+		assert ((Atom.Integer) e4.eval(emptyScope, emptyProgram)).val == 30;
 
-		IfExpr e5 = new IfExpr(new AtomicExpr(new Atom.Bool(false)), new AtomicExpr(new Atom.Val(10)),
-				new AtomicExpr(new Atom.Val(20)));
-		assert ((Atom.Val) e5.eval(emptyScope, emptyProgram)).val == 20;
+		IfExpr e5 = new IfExpr(new AtomicExpr(new Atom.Bool(false)), new AtomicExpr(new Atom.Integer(10)),
+				new AtomicExpr(new Atom.Integer(20)));
+		assert ((Atom.Integer) e5.eval(emptyScope, emptyProgram)).val == 20;
 
-		IfExpr e6 = new IfExpr(new AtomicExpr(new Atom.Bool(true)), new AtomicExpr(new Atom.Val(10)),
-				new AtomicExpr(new Atom.Val(20)));
-		assert ((Atom.Val) e6.eval(emptyScope, emptyProgram)).val == 10;
+		IfExpr e6 = new IfExpr(new AtomicExpr(new Atom.Bool(true)), new AtomicExpr(new Atom.Integer(10)),
+				new AtomicExpr(new Atom.Integer(20)));
+		assert ((Atom.Integer) e6.eval(emptyScope, emptyProgram)).val == 10;
 
 		HashMap<String, Atom> lambdaScope = new HashMap<>();
 
@@ -385,16 +385,16 @@ public abstract class Expr {
 
 		LambdaCall e7 = (LambdaCall) Parser.parseExpr("fib(10)");
 		LambdaCall e8 = (LambdaCall) Parser.parseExpr("add(5, 10)");
-		assert ((Atom.Val) e7.eval(lambdaScope, emptyProgram)).val == 89;
-		assert ((Atom.Val) e8.eval(lambdaScope, emptyProgram)).val == 15;
+		assert ((Atom.Integer) e7.eval(lambdaScope, emptyProgram)).val == 89;
+		assert ((Atom.Integer) e8.eval(lambdaScope, emptyProgram)).val == 15;
 
 		HashMap<String, Atom> newScope = new HashMap<>();
 
 		AssignExpr e9 = (AssignExpr) Parser.parseExpr("let x = 15");
 		e9.eval(newScope, emptyProgram);
-		assert ((Atom.Val) newScope.get("x")).val == 15;
+		assert ((Atom.Integer) newScope.get("x")).val == 15;
 		AssignExpr e10 = (AssignExpr) Parser.parseExpr("let x = x * x");
 		e10.eval(newScope, emptyProgram);
-		assert ((Atom.Val) newScope.get("x")).val == 15 * 15;
+		assert ((Atom.Integer) newScope.get("x")).val == 15 * 15;
 	}
 }

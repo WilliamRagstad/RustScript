@@ -65,7 +65,7 @@ public class Interpreter {
 		String upper = GenerateKernelName("upper");
 		String lower = GenerateKernelName("lower");
 		String substr = GenerateKernelName("substr");
-		String parseVal = GenerateKernelName("parseVal");
+		String parseInt = GenerateKernelName("parseInt");
 		String parseBool = GenerateKernelName("parseBool");
 		program.put(print, (args) -> printFunc.apply(args, null)); // TODO: Allow print functions to accept any number
 		// of arguments
@@ -102,18 +102,18 @@ public class Interpreter {
 		program.put(substr, (args) -> {
 			expectArgs.apply(args, 3, "substr");
 			expectType.apply(args.get(0), Atom.Str.class, "substr");
-			expectType.apply(args.get(1), Atom.Val.class, "substr");
-			expectType.apply(args.get(2), Atom.Val.class, "substr");
-			int start = ((Atom.Val) args.get(1)).val;
-			int end = ((Atom.Val) args.get(2)).val;
+			expectType.apply(args.get(1), Atom.Integer.class, "substr");
+			expectType.apply(args.get(2), Atom.Integer.class, "substr");
+			int start = ((Atom.Integer) args.get(1)).val;
+			int end = ((Atom.Integer) args.get(2)).val;
 			return new Atom.Str(((Atom.Str) args.get(0)).getStringValue().substring(start, end));
 		});
 		// Parsing
-		program.put(parseVal, (args) -> {
-			expectArgs.apply(args, 1, "parseVal");
-			expectType.apply(args.get(0), Atom.Str.class, "parseVal");
+		program.put(parseInt, (args) -> {
+			expectArgs.apply(args, 1, "parseInt");
+			expectType.apply(args.get(0), Atom.Str.class, "parseInt");
 			try {
-				return new Atom.Val(Integer.parseInt(((Atom.Str) args.get(0)).getStringValue()));
+				return new Atom.Integer(Integer.parseInt(((Atom.Str) args.get(0)).getStringValue()));
 			} catch (Exception e) {
 				return new Atom.Unit();
 			}
@@ -137,7 +137,7 @@ public class Interpreter {
 		execute("let upper = fn(s) => " + upper + "(s)");
 		execute("let lower = fn(s) => " + lower + "(s)");
 		execute("let substr = fn(s, b, e) => " + substr + "(s, b, e)");
-		execute("let parseVal = fn(s) => " + parseVal + "(s)");
+		execute("let parseInt = fn(s) => " + parseInt + "(s)");
 		execute("let parseBool = fn(s) => " + parseBool + "(s)");
 
 		// small standard library

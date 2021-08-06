@@ -18,10 +18,10 @@ import java.util.HashMap;
  *          </p>
  */
 public abstract class Atom {
-	public static class Val extends Atom {
+	public static class Integer extends Atom {
 		public int val;
 
-		public Val(int val) {
+		public Integer(int val) {
 			this.val = val;
 		}
 
@@ -175,19 +175,19 @@ public abstract class Atom {
 			return new Atom.Str(((List) this).getStringValue()).add(rhs);
 		}
 
-		if ((this instanceof Val) && (rhs instanceof Val)) {
-			return new Val(((Val) this).val + ((Val) rhs).val);
-		} else if (this instanceof Char && rhs instanceof Val) {
+		if ((this instanceof Integer) && (rhs instanceof Integer)) {
+			return new Integer(((Integer) this).val + ((Integer) rhs).val);
+		} else if (this instanceof Char && rhs instanceof Integer) {
 			char c = ((Char) this).val;
 			int ci = (int) c;
-			int ad = ((Val) rhs).val;
+			int ad = ((Integer) rhs).val;
 			char res = (char) (ci + ad);
 			return new Char(res);
 		} else if (this instanceof Str && rhs instanceof Str) {
 			return new Atom.Str(((Str) this).getStringValue() + ((Str) rhs).getStringValue());
 		} else if (this instanceof Str && !(rhs instanceof List)) { // Str is List
 			String value = ((Atom.Str) this).getStringValue();
-			if (rhs instanceof Val || rhs instanceof Bool)
+			if (rhs instanceof Integer || rhs instanceof Bool)
 				return new Atom.Str(value + rhs.toString());
 			else if (rhs instanceof Char)
 				return new Atom.Str(value + ((Atom.Char) rhs).val);
@@ -207,12 +207,12 @@ public abstract class Atom {
 	}
 
 	public Atom sub(Atom rhs) throws Exception {
-		if ((this instanceof Val) && (rhs instanceof Val)) {
-			return new Val(((Val) this).val - ((Val) rhs).val);
-		} else if (this instanceof Char && rhs instanceof Val) {
+		if ((this instanceof Integer) && (rhs instanceof Integer)) {
+			return new Integer(((Integer) this).val - ((Integer) rhs).val);
+		} else if (this instanceof Char && rhs instanceof Integer) {
 			char c = ((Char) this).val;
 			int ci = (int) c;
-			int rm = ((Val) rhs).val;
+			int rm = ((Integer) rhs).val;
 			char res = (char) (ci - rm);
 			return new Char(res);
 		} else {
@@ -221,32 +221,32 @@ public abstract class Atom {
 	}
 
 	public Atom mul(Atom rhs) throws Exception {
-		if ((this instanceof Val) && (rhs instanceof Val)) {
-			return (Atom) new Val(((Val) this).val * ((Val) rhs).val);
+		if ((this instanceof Integer) && (rhs instanceof Integer)) {
+			return (Atom) new Integer(((Integer) this).val * ((Integer) rhs).val);
 		} else {
 			throw new Exception("Bad Mul");
 		}
 	}
 
 	public Atom div(Atom rhs) throws Exception {
-		if ((this instanceof Val) && (rhs instanceof Val)) {
-			return (Atom) new Val(((Val) this).val / ((Val) rhs).val);
+		if ((this instanceof Integer) && (rhs instanceof Integer)) {
+			return (Atom) new Integer(((Integer) this).val / ((Integer) rhs).val);
 		} else {
 			throw new Exception("Bad Div");
 		}
 	}
 
 	public Atom mod(Atom rhs) throws Exception {
-		if ((this instanceof Val) && (rhs instanceof Val)) {
-			return (Atom) new Val(((Val) this).val % ((Val) rhs).val);
+		if ((this instanceof Integer) && (rhs instanceof Integer)) {
+			return (Atom) new Integer(((Integer) this).val % ((Integer) rhs).val);
 		} else {
 			throw new Exception("Bad Mod");
 		}
 	}
 
 	public Atom lt(Atom rhs) throws Exception {
-		if ((this instanceof Val) && (rhs instanceof Val)) {
-			return (Atom) new Bool(((Val) this).val < ((Val) rhs).val);
+		if ((this instanceof Integer) && (rhs instanceof Integer)) {
+			return (Atom) new Bool(((Integer) this).val < ((Integer) rhs).val);
 		} else if (this instanceof Char && rhs instanceof Char) {
 			return (Atom) new Bool(((Char) this).val < ((Char) rhs).val);
 		} else {
@@ -255,8 +255,8 @@ public abstract class Atom {
 	}
 
 	public Atom gt(Atom rhs) throws Exception {
-		if ((this instanceof Val) && (rhs instanceof Val)) {
-			return (Atom) new Bool(((Val) this).val > ((Val) rhs).val);
+		if ((this instanceof Integer) && (rhs instanceof Integer)) {
+			return (Atom) new Bool(((Integer) this).val > ((Integer) rhs).val);
 		} else if (this instanceof Char && rhs instanceof Char) {
 			return (Atom) new Bool(((Char) this).val > ((Char) rhs).val);
 		} else {
@@ -266,8 +266,8 @@ public abstract class Atom {
 
 	public Atom eq(Atom rhs, HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program)
 			throws Exception {
-		if ((this instanceof Val) && (rhs instanceof Val)) {
-			return (Atom) new Bool(((Val) this).val == ((Val) rhs).val);
+		if ((this instanceof Integer) && (rhs instanceof Integer)) {
+			return (Atom) new Bool(((Integer) this).val == ((Integer) rhs).val);
 		} else if (this instanceof Bool || rhs instanceof Bool) {
 			return (Atom) new Bool(this.isTruthy() == rhs.isTruthy());
 		} else if (this instanceof Char || rhs instanceof Char) {
@@ -290,9 +290,9 @@ public abstract class Atom {
 	}
 
 	public Atom negate() throws Exception {
-		if (this instanceof Val) {
-			Val v = (Val) this;
-			return (Atom) new Val(-v.val);
+		if (this instanceof Integer) {
+			Integer v = (Integer) this;
+			return (Atom) new Integer(-v.val);
 		} else if (this instanceof Bool) {
 			Bool b = (Bool) this;
 			return (Atom) new Bool(!b.val);
