@@ -30,6 +30,18 @@ public abstract class Atom {
 		}
 	}
 
+	public static class Float extends Atom {
+		public double val;
+
+		public Float(double val) {
+			this.val = val;
+		}
+
+		public String toString() {
+			return String.valueOf(val);
+		}
+	}
+
 	public static class Bool extends Atom {
 		public boolean val;
 
@@ -177,6 +189,12 @@ public abstract class Atom {
 
 		if ((this instanceof Integer) && (rhs instanceof Integer)) {
 			return new Integer(((Integer) this).val + ((Integer) rhs).val);
+		} else if ((this instanceof Float) && (rhs instanceof Integer)) {
+			return new Float(((Float) this).val + ((Integer) rhs).val);
+		} else if ((this instanceof Integer) && (rhs instanceof Float)) {
+			return new Float(((Integer) this).val + ((Float) rhs).val);
+		} else if ((this instanceof Float) && (rhs instanceof Float)) {
+			return new Float(((Float) this).val + ((Float) rhs).val);
 		} else if (this instanceof Char && rhs instanceof Integer) {
 			char c = ((Char) this).val;
 			int ci = (int) c;
@@ -209,6 +227,12 @@ public abstract class Atom {
 	public Atom sub(Atom rhs) throws Exception {
 		if ((this instanceof Integer) && (rhs instanceof Integer)) {
 			return new Integer(((Integer) this).val - ((Integer) rhs).val);
+		} else if ((this instanceof Float) && (rhs instanceof Integer)) {
+			return new Float(((Float) this).val - ((Integer) rhs).val);
+		} else if ((this instanceof Integer) && (rhs instanceof Float)) {
+			return new Float(((Integer) this).val - ((Float) rhs).val);
+		} else if ((this instanceof Float) && (rhs instanceof Float)) {
+			return new Float(((Float) this).val - ((Float) rhs).val);
 		} else if (this instanceof Char && rhs instanceof Integer) {
 			char c = ((Char) this).val;
 			int ci = (int) c;
@@ -223,7 +247,13 @@ public abstract class Atom {
 	public Atom mul(Atom rhs) throws Exception {
 		if ((this instanceof Integer) && (rhs instanceof Integer)) {
 			return (Atom) new Integer(((Integer) this).val * ((Integer) rhs).val);
-		} else {
+		} else if ((this instanceof Float) && (rhs instanceof Integer)) {
+			return new Float(((Float) this).val * ((Integer) rhs).val);
+		} else if ((this instanceof Integer) && (rhs instanceof Float)) {
+			return new Float(((Integer) this).val * ((Float) rhs).val);
+		} else if ((this instanceof Float) && (rhs instanceof Float)) {
+			return new Float(((Float) this).val * ((Float) rhs).val);
+		}else {
 			throw new Exception("Bad Mul");
 		}
 	}
@@ -231,7 +261,13 @@ public abstract class Atom {
 	public Atom div(Atom rhs) throws Exception {
 		if ((this instanceof Integer) && (rhs instanceof Integer)) {
 			return (Atom) new Integer(((Integer) this).val / ((Integer) rhs).val);
-		} else {
+		} else if ((this instanceof Float) && (rhs instanceof Integer)) {
+			return new Float(((Float) this).val / ((Integer) rhs).val);
+		} else if ((this instanceof Integer) && (rhs instanceof Float)) {
+			return new Float(((Integer) this).val / ((Float) rhs).val);
+		} else if ((this instanceof Float) && (rhs instanceof Float)) {
+			return new Float(((Float) this).val / ((Float) rhs).val);
+		}else {
 			throw new Exception("Bad Div");
 		}
 	}

@@ -94,12 +94,27 @@ public class Tokenizer {
 
 	private void scanNumber() {
 		int start = position;
-		while (!isFinished() && Character.isDigit(peek())) {
-			eat();
+		boolean isFloat = false;
+		while (!isFinished() && (Character.isDigit(peek()) || peek() == '.')) {
+			char n = eat();
+			if (n == '.') {
+				if (isFloat || !Character.isDigit(peek())) {
+					// Break if already is a float or if the next character is not a digit
+					position--; // Put the . character back
+					break;
+				}
+				else {
+					isFloat = true;
+				}
+			}
 		}
 
 		String lexeme = input.substring(start, position);
-		addToken(TokenTy.Number, lexeme);
+		if (isFloat) {
+			addToken(TokenTy.Float, lexeme);
+		} else {
+			addToken(TokenTy.Integer, lexeme);
+		}
 	}
 
 	private static boolean isHex(char c) {
@@ -329,17 +344,27 @@ public class Tokenizer {
 
 		{
 			// tests scanNumber
-			String numbers = "5 10 20 30";
-			String[] numberLS = numbers.split(" ");
 
-			for (int i = 0; i < numberLS.length; i += 1) {
-				var t1 = new Tokenizer(numberLS[i]);
+			String[] integers = "5 10 20 30".split(" ");
+			for (int i = 0; i < integers.length; i += 1) {
+				var t1 = new Tokenizer(integers[i]);
 				t1.scanNumber();
 
 				Token t = t1.output.get(0);
 
-				assert t.ty == TokenTy.Number;
-				assert t.lexeme.equals(numberLS[i]);
+				assert t.ty == TokenTy.Integer;
+				assert t.lexeme.equals(integers[i]);
+			}
+
+			String[] floats = "1.2 1.0 0.2 30.5".split(" ");
+			for (int i = 0; i < floats.length; i += 1) {
+				var t1 = new Tokenizer(floats[i]);
+				t1.scanNumber();
+
+				Token t = t1.output.get(0);
+
+				assert t.ty == TokenTy.Float;
+				assert t.lexeme.equals(floats[i]);
 			}
 		}
 
@@ -366,7 +391,7 @@ public class Tokenizer {
 			assert t.output.get(t.output.size() - 1).lexeme.equals("[");
 
 			t.addNextToken();
-			assert t.output.get(t.output.size() - 1).ty == TokenTy.Number;
+			assert t.output.get(t.output.size() - 1).ty == TokenTy.Integer;
 			assert t.output.get(t.output.size() - 1).lexeme.equals("10");
 
 			t.addNextToken();
@@ -374,7 +399,7 @@ public class Tokenizer {
 			assert t.output.get(t.output.size() - 1).lexeme.equals("..");
 
 			t.addNextToken();
-			assert t.output.get(t.output.size() - 1).ty == TokenTy.Number;
+			assert t.output.get(t.output.size() - 1).ty == TokenTy.Integer;
 			assert t.output.get(t.output.size() - 1).lexeme.equals("12");
 
 			t.addNextToken();
@@ -382,7 +407,7 @@ public class Tokenizer {
 			assert t.output.get(t.output.size() - 1).lexeme.equals("]");
 
 			t.addNextToken();
-			assert t.output.get(t.output.size() - 1).ty == TokenTy.Number;
+			assert t.output.get(t.output.size() - 1).ty == TokenTy.Integer;
 			assert t.output.get(t.output.size() - 1).lexeme.equals("15");
 
 			t.addNextToken();
@@ -406,13 +431,13 @@ public class Tokenizer {
 			assert tokens.get(3).ty == TokenTy.LBracket;
 			assert tokens.get(3).lexeme.equals("[");
 
-			assert tokens.get(4).ty == TokenTy.Number;
+			assert tokens.get(4).ty == TokenTy.Integer;
 			assert tokens.get(4).lexeme.equals("0");
 
 			assert tokens.get(5).ty == TokenTy.DotDot;
 			assert tokens.get(5).lexeme.equals("..");
 
-			assert tokens.get(6).ty == TokenTy.Number;
+			assert tokens.get(6).ty == TokenTy.Integer;
 			assert tokens.get(6).lexeme.equals("15");
 
 			assert tokens.get(7).ty == TokenTy.RBracket;

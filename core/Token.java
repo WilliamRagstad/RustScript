@@ -32,7 +32,8 @@ public class Token {
 	public String toString() {
 		return switch (ty) {
 			case Ident -> String.format("Ident '%s'", lexeme);
-			case Number -> String.format("Number %s", lexeme);
+			case Integer -> String.format("Integer %s", lexeme);
+			case Float -> String.format("Float %s", lexeme);
 			default -> String.format("%s", ty.toString());
 		};
 	}
@@ -43,7 +44,7 @@ enum TokenTy {
 
 	LBracket, RBracket,
 
-	Ident, Number, Character, String, True, False,
+	Ident, Integer, Float, Character, String, True, False,
 
 	Add, Sub, Mul, Div, Mod,
 
