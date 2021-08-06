@@ -159,7 +159,7 @@ public class Interpreter {
 	 * Clean the interpreter state and start fresh. The interpreter can then be
 	 * reused for running a new program.
 	 */
-	public void clean() {
+	public void clear() {
 		globals.clear();
 		program.clear();
 		// load built-ins
@@ -168,6 +168,7 @@ public class Interpreter {
 		} catch (Exception e) {
 			// Exceptions cannot be thrown from the interpreter if we have gotten to this
 			// point.
+			System.out.println(e.getMessage());
 		}
 	}
 
