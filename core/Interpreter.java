@@ -64,6 +64,9 @@ public class Interpreter {
 		String typeof = GenerateKernelName("typeof");
 		String upper = GenerateKernelName("upper");
 		String lower = GenerateKernelName("lower");
+		String round = GenerateKernelName("round");
+		String floor = GenerateKernelName("floor");
+		String ceil = GenerateKernelName("ceil");
 		String substr = GenerateKernelName("substr");
 		String parseInt = GenerateKernelName("parseInt");
 		String parseBool = GenerateKernelName("parseBool");
@@ -98,6 +101,21 @@ public class Interpreter {
 			expectArgs.apply(args, 1, "lower");
 			expectType.apply(args.get(0), Atom.Str.class, "lower");
 			return new Atom.Str(((Atom.Str) args.get(0)).getStringValue().toLowerCase());
+		});
+		program.put(round, (args) -> {
+			expectArgs.apply(args, 1, "round");
+			expectType.apply(args.get(0), Atom.Float.class, "round");
+			return new Atom.Integer((int) Math.round(((Atom.Float) args.get(0)).val));
+		});
+		program.put(floor, (args) -> {
+			expectArgs.apply(args, 1, "floor");
+			expectType.apply(args.get(0), Atom.Float.class, "floor");
+			return new Atom.Integer((int)((Atom.Float) args.get(0)).val);
+		});
+		program.put(ceil, (args) -> {
+			expectArgs.apply(args, 1, "ceil");
+			expectType.apply(args.get(0), Atom.Float.class, "ceil");
+			return new Atom.Integer((int) Math.ceil(((Atom.Float) args.get(0)).val));
 		});
 		program.put(substr, (args) -> {
 			expectArgs.apply(args, 3, "substr");
@@ -136,6 +154,9 @@ public class Interpreter {
 		execute("let typeof = fn(e) => " + typeof + "(e)");
 		execute("let upper = fn(s) => " + upper + "(s)");
 		execute("let lower = fn(s) => " + lower + "(s)");
+		execute("let round = fn(s) => " + round + "(s)");
+		execute("let floor = fn(s) => " + floor + "(s)");
+		execute("let ceil = fn(s) => " + ceil + "(s)");
 		execute("let substr = fn(s, b, e) => " + substr + "(s, b, e)");
 		execute("let parseInt = fn(s) => " + parseInt + "(s)");
 		execute("let parseBool = fn(s) => " + parseBool + "(s)");
