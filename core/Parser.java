@@ -116,7 +116,7 @@ public class Parser {
 	private Expr parseMatchExpr(Token nx) throws Exception {
 		Expr value = exprBP(0);
 		ArrayList<MatchCaseExpr> cases = new ArrayList<>();
-		while (!isFinished() && peek().ty == TokenTy.Got) {
+		while (!isFinished() && peek().ty == TokenTy.MatchCase) {
 			eat(); // Eat the Got token
 			Token patternToken = peek();
 			Expr patternExpr = exprBP(0);
@@ -127,7 +127,7 @@ public class Parser {
 						"If you want to mimic pattern matching, use a constraint by adding 'and <condition>' after wards."));
 			}
 			Expr constraint = null;
-			if (peek().ty == TokenTy.GotAnd) {
+			if (peek().ty == TokenTy.MatchCaseCond) {
 				// Parse constraint
 				eat(); // Eat the GotAnd token
 				constraint = exprBP(0);

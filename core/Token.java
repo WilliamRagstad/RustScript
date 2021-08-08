@@ -52,7 +52,7 @@ enum TokenTy {
 
 	And, Or,
 
-	If, Then, Else, Match, Got, GotAnd,
+	If, Then, Else, Match, MatchCase, MatchCaseCond,
 
 	Let, Assign, Variation, Comma,
 

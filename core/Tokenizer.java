@@ -90,8 +90,7 @@ public class Tokenizer {
 			case "true" -> addToken(TokenTy.True, lexeme);
 			case "false" -> addToken(TokenTy.False, lexeme);
 			case "match" -> addToken(TokenTy.Match, lexeme);
-			case "got" -> addToken(TokenTy.Got, lexeme);
-			case "and" -> addToken(TokenTy.GotAnd, lexeme);
+			case "and" -> addToken(TokenTy.MatchCaseCond, lexeme);
 			default -> addToken(TokenTy.Ident, lexeme);
 		}
 	}
@@ -203,7 +202,7 @@ public class Tokenizer {
 				if (expect('|')) {
 					addToken(TokenTy.Or, "||");
 				} else {
-					throw new Exception(error("Found a single '|', did you mean '||'?"));
+					addToken(TokenTy.MatchCase, '|');
 				}
 			}
 			case '&' -> {
