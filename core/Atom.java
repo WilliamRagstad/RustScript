@@ -3,6 +3,8 @@ package core;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import core.formatting.EscapeSequence;
+
 /**
  * @author Mikail Khan <mikail@mikail-khan.com>
  *
@@ -66,7 +68,7 @@ public abstract class Atom {
 		}
 
 		public String toString() {
-			return '\'' + String.valueOf(val) + '\'';
+			return "\'" + EscapeSequence.escape(getCharValue()) + "\'";
 		}
 	}
 
@@ -86,17 +88,28 @@ public abstract class Atom {
 			return true;
 		}
 
-		public String getStringValue() {
+		/**
+		 * Convert list of characters to string
+		 * @param escapeCharacters Whether to show escaping of special characters using backslash notation
+		 * @return
+		 */
+		public String getStringValue(boolean escapeCharacters) {
 			String result = "";
 			for (int i = 0; i < list.size(); i++) {
-				result += ((Atom.Char) ((Expr.AtomicExpr) list.get(i)).val).val;
+				char c = ((Atom.Char) ((Expr.AtomicExpr) list.get(i)).val).val;
+				if (escapeCharacters) {
+					result += EscapeSequence.escape(c);
+				}
+				else {
+					result += c;
+				}
 			}
 			return result;
 		}
 
 		public String toString() {
 			if (isCharArray())
-				return String.format("\"%s\"", getStringValue());
+				return String.format("\"%s\"", getStringValue(true));
 			return list.toString();
 		}
 	}
@@ -127,7 +140,7 @@ public abstract class Atom {
 		}
 
 		public String toString() {
-			return String.format("\"%s\"", name);
+			return name;
 		}
 	}
 
@@ -204,7 +217,7 @@ public abstract class Atom {
 	public Atom add(Atom rhs) throws Exception {
 		if (this instanceof List && !(this instanceof Str) && ((List) this).isCharArray()) {
 			// If a List but classify as Str, convert it
-			return new Atom.Str(((List) this).getStringValue()).add(rhs);
+			return new Atom.Str(((List) this).getStringValue(false)).add(rhs);
 		}
 
 		if ((this instanceof Integer) && (rhs instanceof Integer)) {
@@ -222,11 +235,12 @@ public abstract class Atom {
 			char res = (char) (ci + ad);
 			return new Char(res);
 		} else if (this instanceof Str && rhs instanceof Str) {
-			return new Atom.Str(((Str) this).getStringValue() + ((Str) rhs).getStringValue());
+			return new Atom.Str(((Str) this).getStringValue(false) + ((Str) rhs).getStringValue(false));
 		} else if (this instanceof Str && !(rhs instanceof List)) { // Str is List
-			String value = ((Atom.Str) this).getStringValue();
+			String value = ((Atom.Str) this).getStringValue(false);
 			if (rhs instanceof Char) {
-				return new Atom.Str(value + ((Atom.Char) rhs).val);
+				String newstring = value + ((Atom.Char) rhs).val;
+				return new Atom.Str(newstring);
 			}
 			return new Atom.Str(value + rhs.toString());
 			// else Badd
@@ -238,7 +252,7 @@ public abstract class Atom {
 			newList.list.addAll(lArr.list);
 			newList.list.addAll(rArr.list);
 			if (newList.isCharArray())
-				return new Atom.Str(newList.getStringValue());
+				return new Atom.Str(newList.getStringValue(false));
 			return newList;
 		}
 		throw new Exception("Badd");

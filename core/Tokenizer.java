@@ -1,6 +1,9 @@
 package core;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import core.formatting.EscapeSequence;
 
 /**
  * @author Mikail Khan <mikail@mikail-khan.com>, William Rågstad <william.ragstad@gmail.com>
@@ -118,44 +121,6 @@ public class Tokenizer {
 		}
 	}
 
-	private static boolean isHex(char c) {
-		return Character.isDigit(c) || (c >= 'A' && c <= 'F');
-	}
-
-	private static boolean isHex(String s) {
-		for (int i = 0; i < s.length(); i++) {
-			if (!isHex(s.charAt(i)))
-				return false;
-		}
-		return true;
-	}
-
-	private String unescaper(String sequence) {
-		// TODO: Implement unescaper for: https://en.wikipedia.org/wiki/Escape_character
-		// * Octal (\1 to \377)
-		// * Unicode: https://en.wikipedia.org/wiki/List_of_Unicode_characters
-		// https://www.rapidtables.com/code/text/unicode-characters.html
-		// * Control characters: https://en.wikipedia.org/wiki/Control_character
-		// * Whitespace characters: https://en.wikipedia.org/wiki/Whitespace_character
-		String result = "";
-		for (int p = 0; p < sequence.length(); p++) {
-			char c = sequence.charAt(p);
-			if (c == '\\') {
-				p++;
-				String remaining = sequence.substring(p);
-				if (remaining.length() >= 5 && remaining.charAt(0) == 'u' && isHex(remaining.substring(1, 5))) {
-					char unicodeChar = (char) Integer.parseInt(remaining.substring(1, 5), 16);
-					result += unicodeChar;
-					p += 4; // p will increment before next iteration
-				} else {
-					result += remaining.charAt(0);
-				}
-			} else
-				result += c;
-		}
-		return result;
-	}
-
 	private void scanCharacter() throws Exception {
 		expect('\''); // Will always match
 		int start = position;
@@ -175,7 +140,7 @@ public class Tokenizer {
 			throw new Exception(
 					error("Found character with a missing closing apostrophe, did you mean '" + lexeme + "'?"));
 
-		String characters = unescaper(lexeme);
+		String characters = EscapeSequence.unescape(lexeme);
 		if (characters.length() > 1)
 			throw new Exception(error("Found invalid character, did you mean \"" + characters + "\"?"));
 		char character = characters.charAt(0);
@@ -200,7 +165,7 @@ public class Tokenizer {
 			throw new Exception(
 					error("Found string with a missing closing quotation mark, did you mean \"" + lexeme + "\"?"));
 
-		String string = unescaper(lexeme);
+		String string = EscapeSequence.unescape(lexeme);
 
 		addToken(TokenTy.String, string);
 	}

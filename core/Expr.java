@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import core.Atom.Lambda.LambdaVariation;
+import core.formatting.EscapeSequence;
 
 /**
  * @author Mikail Khan <mikail@mikail-khan.com>
@@ -47,7 +48,7 @@ public abstract class Expr {
 				}
 				Atom.List result = new Atom.List(nls);
 				if (result.isCharArray())
-					return new Atom.Str(result.getStringValue());
+					return new Atom.Str(result.getStringValue(false));
 				return result;
 			} else {
 				return val;
@@ -65,7 +66,7 @@ public abstract class Expr {
 		}
 
 		public String toString() {
-			return String.valueOf(val);
+			return val.toString();
 		}
 	}
 

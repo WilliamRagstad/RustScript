@@ -3,6 +3,7 @@ package core;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.function.Function;
 
 /**
  * @author Mikail Khan <mikail@mikail-khan.com>, William Rågstad <william.ragstad@gmail.com>
@@ -41,25 +42,8 @@ public class Interpreter {
 						String.format("Type missmatch! Invalid argument %s to function %s, is not of type %s",
 								arg.toString(), name, expected.getSimpleName()));
 		};
-		Function2<ArrayList<Atom>, Character, Atom> printFunc = (args, suffix) -> {
-			for (int i = 0; i < args.size(); i++) {
-				Atom val = args.get(i); // args.get(i).eval(globals, program)
-				if (val instanceof Atom.Str)
-					System.out.print(((Atom.Str) val).getStringValue());
-				else if (val instanceof Atom.Char)
-					System.out.print(((Atom.Char) val).getCharValue());
-				else
-					System.out.print(val.toString());
-				if (i < args.size() - 1)
-					System.out.print(' ');
-			}
-			if (suffix != null)
-				System.out.print(suffix);
-			return new Atom.Unit();
-		};
 		// Load program built-ins
 		String print = GenerateKernelName("print");
-		String println = GenerateKernelName("println");
 		String input = GenerateKernelName("input");
 		String typeof = GenerateKernelName("typeof");
 		String upper = GenerateKernelName("upper");
@@ -70,9 +54,18 @@ public class Interpreter {
 		String substr = GenerateKernelName("substr");
 		String parseInt = GenerateKernelName("parseInt");
 		String parseBool = GenerateKernelName("parseBool");
-		program.put(print, (args) -> printFunc.apply(args, null)); // TODO: Allow print functions to accept any number
-		// of arguments
-		program.put(println, (args) -> printFunc.apply(args, '\n'));
+		// TODO: Allow print functions to accept any number of arguments
+		program.put(print, (args) -> {
+			expectArgs.apply(args, 1, "print");
+			Atom val = args.get(0); // eval?
+			if (val instanceof Atom.Str)
+				System.out.print(((Atom.Str) val).getStringValue(false));
+			else if (val instanceof Atom.Char)
+				System.out.print(((Atom.Char) val).getCharValue());
+			else
+				System.out.print(val.toString());
+			return new Atom.Unit();
+		});
 		program.put(input, (args) -> {
 			expectArgs.apply(args, 1, "input");
 			Atom textAtom = args.get(0); // args.get(0).eval(globals, program)
@@ -80,7 +73,7 @@ public class Interpreter {
 				throw new Exception(String.format("Can't coerce %s to a string or char", textAtom.toString()));
 			String textVal = null;
 			if (textAtom instanceof Atom.Str)
-				textVal = ((Atom.Str) textAtom).getStringValue();
+				textVal = ((Atom.Str) textAtom).getStringValue(false);
 			if (textAtom instanceof Atom.Char)
 				textVal = "" + ((Atom.Char) textAtom).val;
 			System.out.print(textVal);
@@ -95,12 +88,12 @@ public class Interpreter {
 		program.put(upper, (args) -> {
 			expectArgs.apply(args, 1, "upper");
 			expectType.apply(args.get(0), Atom.Str.class, "upper");
-			return new Atom.Str(((Atom.Str) args.get(0)).getStringValue().toUpperCase());
+			return new Atom.Str(((Atom.Str) args.get(0)).getStringValue(false).toUpperCase());
 		});
 		program.put(lower, (args) -> {
 			expectArgs.apply(args, 1, "lower");
 			expectType.apply(args.get(0), Atom.Str.class, "lower");
-			return new Atom.Str(((Atom.Str) args.get(0)).getStringValue().toLowerCase());
+			return new Atom.Str(((Atom.Str) args.get(0)).getStringValue(false).toLowerCase());
 		});
 		program.put(round, (args) -> {
 			expectArgs.apply(args, 1, "round");
@@ -124,14 +117,14 @@ public class Interpreter {
 			expectType.apply(args.get(2), Atom.Integer.class, "substr");
 			int start = ((Atom.Integer) args.get(1)).val;
 			int end = ((Atom.Integer) args.get(2)).val;
-			return new Atom.Str(((Atom.Str) args.get(0)).getStringValue().substring(start, end));
+			return new Atom.Str(((Atom.Str) args.get(0)).getStringValue(false).substring(start, end));
 		});
 		// Parsing
 		program.put(parseInt, (args) -> {
 			expectArgs.apply(args, 1, "parseInt");
 			expectType.apply(args.get(0), Atom.Str.class, "parseInt");
 			try {
-				return new Atom.Integer(Integer.parseInt(((Atom.Str) args.get(0)).getStringValue()));
+				return new Atom.Integer(Integer.parseInt(((Atom.Str) args.get(0)).getStringValue(false)));
 			} catch (Exception e) {
 				return new Atom.Unit();
 			}
@@ -139,7 +132,7 @@ public class Interpreter {
 		program.put(parseBool, (args) -> {
 			expectArgs.apply(args, 1, "parseBool");
 			expectType.apply(args.get(0), Atom.Str.class, "parseBool");
-			String val = ((Atom.Str) args.get(0)).getStringValue().trim().toLowerCase();
+			String val = ((Atom.Str) args.get(0)).getStringValue(false).trim().toLowerCase();
 			if (val.equals("true"))
 				return new Atom.Bool(true);
 			else if (val.equals("false"))
@@ -149,7 +142,11 @@ public class Interpreter {
 		});
 		// wrappers for built-ins
 		execute("let print = fn(s) => " + print + "(s)");
-		execute("let println = fn(s) => " + println + "(s)");
+		execute("var print = fn(s1, s2) => print(s1 + ' ' + s2)");
+		execute("var print = fn(s1, s2, s3) => print(s1, s2 + ' ' + s3)");
+		execute("let println = fn(s) => " + print + "(s + '\\n')");
+		execute("var println = fn(s1, s2) => println(s2 + ' ' + s2)");
+		execute("var println = fn(s1, s2, s3) => println(s2, s2 + ' ' + s3)");
 		execute("let input = fn(s) => " + input + "(s)");
 		execute("let typeof = fn(e) => " + typeof + "(e)");
 		execute("let upper = fn(s) => " + upper + "(s)");
