@@ -147,7 +147,6 @@ public class Interpreter {
 		execute("let println = fn(s) => " + print + "(str(s) + '\\n')");
 		execute("var println = fn(s1, s2) => println(str(s1) + \" \" + s2)");
 		execute("var println = fn(s1, s2, s3) => println(str(s1) + \" \" + s2, s3)");
-		execute("let str = fn(obj) => \"\" + obj");
 		execute("let input = fn(s) => " + input + "(s)");
 		execute("let typeof = fn(e) => " + typeof + "(e)");
 		execute("let upper = fn(s) => " + upper + "(s)");
@@ -155,6 +154,7 @@ public class Interpreter {
 		execute("let round = fn(s) => " + round + "(s)");
 		execute("let floor = fn(s) => " + floor + "(s)");
 		execute("let ceil = fn(s) => " + ceil + "(s)");
+		execute("let str = fn(obj) => \"\" + obj");
 		execute("let substr = fn(s, b, e) => " + substr + "(s, b, e)");
 		execute("let parseInt = fn(s) => " + parseInt + "(s)");
 		execute("let parseBool = fn(s) => " + parseBool + "(s)");
