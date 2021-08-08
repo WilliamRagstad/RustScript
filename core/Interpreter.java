@@ -141,12 +141,13 @@ public class Interpreter {
 				return new Atom.Unit();
 		});
 		// wrappers for built-ins
-		execute("let print = fn(s) => " + print + "(s)");
-		execute("var print = fn(s1, s2) => print(s1 + ' ' + s2)");
-		execute("var print = fn(s1, s2, s3) => print(s1, s2 + ' ' + s3)");
-		execute("let println = fn(s) => " + print + "(s + '\\n')");
-		execute("var println = fn(s1, s2) => println(s2 + ' ' + s2)");
-		execute("var println = fn(s1, s2, s3) => println(s2, s2 + ' ' + s3)");
+		execute("let print = fn(s) => " + print + "(str(s))");
+		execute("var print = fn(s1, s2) => print(str(s1) + \" \" + s2)");
+		execute("var print = fn(s1, s2, s3) => print(str(s1) + \" \" + s2, s3)");
+		execute("let println = fn(s) => " + print + "(str(s) + '\\n')");
+		execute("var println = fn(s1, s2) => println(str(s1) + \" \" + s2)");
+		execute("var println = fn(s1, s2, s3) => println(str(s1) + \" \" + s2, s3)");
+		execute("let str = fn(obj) => \"\" + obj");
 		execute("let input = fn(s) => " + input + "(s)");
 		execute("let typeof = fn(e) => " + typeof + "(e)");
 		execute("let upper = fn(s) => " + upper + "(s)");
