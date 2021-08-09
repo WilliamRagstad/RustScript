@@ -105,6 +105,7 @@ let capC = 'C'
 ```rust
 "\u0007" == "\a" // true
 "\t" + "Hi" + '\n' //	Hi
+'\u0049' - 8 == 'A' // true
 ```
 
 [Foramtting logic](https://github.com/WilliamRagstad/RustScript/blob/main/core/formatting/EscapeSequence.java).

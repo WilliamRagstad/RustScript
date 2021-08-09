@@ -19,6 +19,8 @@ public class EscapeSequence {
 		put('f', '\f');
 		put('e', (char)27);
         put('\\', '\\');
+		put('\'', '\'');
+		put('\"', '\"');
 	}};
 
     public static String unescape(String sequence) {
@@ -28,25 +30,24 @@ public class EscapeSequence {
 		// https://www.rapidtables.com/code/text/unicode-characters.html
 		// * Control characters: https://en.wikipedia.org/wiki/Control_character
 		// * Whitespace characters: https://en.wikipedia.org/wiki/Whitespace_character
+		String errorInfo = "Escaping backslash must be followed by either escape character code or a prefix \\uHHHH followed by the unicode hex(H) value.";
 		String result = "";
 		for (int p = 0; p < sequence.length(); p++) {
 			char c = sequence.charAt(p);
 			if (c == '\\') {
 				p++;
 				if (p >= sequence.length()) {
-					throw new RuntimeException("Unexpected end of string! Escaping backslash must be followed by either escape character code or a prefix u followed by the unicode hex value.");
+					throw new RuntimeException("Unexpected end of string! " + errorInfo);
 				}
 				String remaining = sequence.substring(p);
 				if (remaining.length() >= 5 && remaining.charAt(0) == 'u' && isHex(remaining.substring(1, 5))) {
 					char unicodeChar = (char) Integer.parseInt(remaining.substring(1, 5), 16);
 					result += unicodeChar;
 					p += 4; // p will increment before next iteration
+				} else if (codes.containsKey(remaining.charAt(0))) {
+					result += codes.get(remaining.charAt(0));
 				} else {
-					if (codes.containsKey(remaining.charAt(0))) {
-						result += codes.get(remaining.charAt(0));
-					} else {
-						result += remaining.charAt(0);
-					}
+					throw new RuntimeException(String.format("Unexpected special character '\\%s'! %s", remaining.charAt(0), errorInfo));
 				}
 			} else
 				result += c;
