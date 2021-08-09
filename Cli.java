@@ -13,7 +13,7 @@ import java.util.Arrays;
 public class Cli {
 	private static final String VERSION = "2.2.0";
 	private static final String DESCRIPTION = "A command line interface tool for the RustScript language.";
-	private static final String COPYRIGHT = "Copyright (c) 2021 William Rågstad";
+	private static final String COPYRIGHT = "Copyright (c) 2021 William Ragstad";
 	private static final String HELP = String.format("""
 			RustScript CLI version %s.
 			%s
