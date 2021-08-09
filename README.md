@@ -26,20 +26,24 @@
 
 ### 🔌Run
 
-See CLI user manual/help by running `rsc` with the `--help` or `-h` options.
-Run a script using the following command.
+> Don't forget to download the latest version from above, and install the RustScript toolchain as described in the `README.md` installation instructions file that comes pre-packaged.
+
+Run the `rsc` command with either the `--help` or `-h` option to show the user manual or help page for the CLI tool.
+Execute scripts using the following command.
 
 ```shell
-java -jar rsc.jar <script>
+rsc hello.rs world.rs
+```
+
+Or if you haven't installed the native CLI binaries, run the `rsc.jar` file using:
+
+```shell
+java -jar rsc.jar hello.rs
 ```
 
 ### 🔨 Build
 
-If you want to build RustScript on your own, run the command below to build the `Runner.java` class into a standalone executable.
-
-```shell
-jar -cvmf manifest.txt rsc.jar *.class core/*.class
-```
+If you want to build RustScript on your own. Install the **WiX Toolset** (`dist/tools/wix311.exe`) and run the `build` command from the root directory to build the `Cli.java` class into the standalone executables to `dist/bin/`.
 
 ---
 
