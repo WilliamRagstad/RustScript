@@ -18,7 +18,7 @@
 
 > ## 📥 Install
 >
-> [Download](https://github.com/WilliamRagstad/RustScript/releases/latest/download/rsc.zip) the latest version of the RustScript CLI tool `rsc`, or [view all releases](https://github.com/WilliamRagstad/RustScript/releases).
+> [Download](https://github.com/WilliamRagstad/RustScript/releases/latest/download/rsc.zip) the latest version of the RustScript CLI tool, or [view all releases](https://github.com/WilliamRagstad/RustScript/releases).
 
 <br>
 
