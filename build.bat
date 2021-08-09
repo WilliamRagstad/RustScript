@@ -9,8 +9,9 @@ javac *.java core/*.java core/formatting/*.java
 jar -cvmf manifest.txt dist\bin\rsc.jar *.class core/*.class core/formatting/*.class
 cd dist\bin
 echo Building native binary...
-jpackage --name rsc --input . --main-jar rsc.jar --main-class Cli --type msi --vendor "William Rågstad" --description "The RustScript CLI tool" --app-version %version% --icon ../icon.ico --file-associations ../assoc.properties --win-console
+jpackage --name rsc --input . --main-jar rsc.jar --main-class Cli --type msi --vendor "William Ragstad" --description "The RustScript CLI tool" --app-version %version% --icon ../icon.ico --file-associations ../assoc.properties --win-console
 copy ..\README.md .
+powershell /c "Compress-Archive * rsc.zip"
 
 @echo off
 cd ..\..
