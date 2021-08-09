@@ -3,14 +3,21 @@ package core.formatting;
 import java.util.HashMap;
 import java.util.Optional;
 
+/**
+ * https://en.wikipedia.org/wiki/Escape_sequences_in_C
+ * https://en.wikipedia.org/wiki/Escape_sequence
+ */
 public class EscapeSequence {
     private static HashMap<Character, Character> codes = new HashMap<>() {{
 		put('0', '\0');
+		put('a', (char)7);
 		put('n', '\n');
 		put('r', '\r');
 		put('t', '\t');
+		put('v', (char)11);
 		put('b', '\b');
 		put('f', '\f');
+		put('e', (char)27);
         put('\\', '\\');
 	}};
 

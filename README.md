@@ -100,6 +100,15 @@ let capC = 'C'
 "Hi" + [65, 10] // ['H', 'i', 65, 10]
 ```
 
+### Special Characters
+
+```rust
+"\u0007" == "\a" // true
+"\t" + "Hi" + '\n' //	Hi
+```
+
+[Foramtting logic](https://github.com/WilliamRagstad/RustScript/blob/main/core/formatting/EscapeSequence.java).
+
 ### Ranges
 
 ```rust
