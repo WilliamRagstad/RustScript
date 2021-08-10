@@ -179,8 +179,8 @@ fib(15) // 987
 ```rust
 let text = input("Enter number: ")
 match parseVal(text)
-	got val and has(val) then println(val * 2)
-	got _ then println("Could not parse input number!")
+	| val and has(val) then println(val * 2)
+	| _ then println("Could not parse input number!")
 ```
 
 
