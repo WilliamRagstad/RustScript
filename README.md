@@ -284,11 +284,6 @@ square(sum([1..100])) - (sum(fmap(square, [1..100])))
 
 
 
-## Logo Credits
-
-The logo is a modified image by [Smashicons](https://smashicons.com/) from [Flaticon](https://www.flaticon.com). The original images can be found [here](https://www.flaticon.com/search?word=rusty&style=all&order_by=4&type=icon) or in the [assets](https://github.com/WilliamRagstad/RustScript/tree/main/assets) folder.
-
-
 ## Community
 The RustScript language is developed by a group of volunteers. To further support the project, we welcome any and all **feedback**, **contributions** and **engagement**!
 
@@ -299,6 +294,7 @@ The RustScript language is developed by a group of volunteers. To further suppor
 * ### Sponsor the project: https://github.com/sponsors/WilliamRagstad
 
 * ### Donate: https://www.paypal.com/paypalme/williamragstad
+
 
 
 ## ✨ Contributors
@@ -321,3 +317,25 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+
+
+## Logo Credits
+
+The logo is a modified image by [Smashicons](https://smashicons.com/) from [Flaticon](https://www.flaticon.com). The original images can be found [here](https://www.flaticon.com/search?word=rusty&style=all&order_by=4&type=icon) or in the [assets](https://github.com/WilliamRagstad/RustScript/tree/main/assets) folder.
+
+
+## License
+
+RustScript is free and open source! All code in this repository is dual-licensed under either:
+
+* MIT License ([LICENSE-MIT](docs/LICENSE-MIT) or [http://opensource.org/licenses/MIT](http://opensource.org/licenses/MIT))
+* Apache License, Version 2.0 ([LICENSE-APACHE](docs/LICENSE-APACHE) or [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0))
+
+at your option. This means you can select the license you prefer! This dual-licensing approach is the de-facto standard in the Rust ecosystem and there are very good reasons to include both. Read more about Rusts license model [here](https://rust-lang.github.io/api-guidelines/necessities.html#necessities).
+
+## Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
+dual licensed as above, without any additional terms or conditions.
