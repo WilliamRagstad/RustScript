@@ -8,21 +8,21 @@ import core.Atom.Lambda.LambdaVariation;
 import core.formatting.EscapeSequence;
 
 /**
- * @author Mikail Khan <mikail@mikail-khan.com>
+ * @author Mikail Khan <mikail@mikail-khan.com>, William Rågstad
+ *         <william.ragstad@gmail.com>
  *
- *          An expression, the AST of this language.
+ *         An expression, the AST of this language.
  *
- *          <p>
- *          Because this is a functional expression based language, there are no
- *          statements, only expressions. In other words, everything returns
- *          something, even if it's just the unit type.
- *          </p>
+ *         <p>
+ *         Because this is a functional expression based language, there are no
+ *         statements, only expressions. In other words, everything returns
+ *         something, even if it's just the unit type.
+ *         </p>
  */
 public abstract class Expr {
 	public int startIndex, endIndex;
 
-	public abstract Atom eval(HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program)
-			throws Exception;
+	public abstract Atom eval(Scope scope) throws Exception;
 
 	public Expr(int startIndex, int endIndex) {
 		this.startIndex = startIndex;
@@ -32,10 +32,10 @@ public abstract class Expr {
 	public static class AtomicExpr extends Expr {
 		Atom val;
 
-		public Atom eval(HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
+		public Atom eval(Scope scope) throws Exception {
 			if (val instanceof Atom.Ident) {
 				Atom.Ident v = (Atom.Ident) val;
-				var res = variables.get(v.name);
+				var res = scope.get(v.name);
 				if (res == null) {
 					throw new Exception(String.format("Tried to access nonexistent variable %s", v.name));
 				}
@@ -44,7 +44,7 @@ public abstract class Expr {
 				Atom.List ls = (Atom.List) val;
 				ArrayList<Expr> nls = new ArrayList<>();
 				for (Expr expr : ls.list) {
-					nls.add(new AtomicExpr(expr.eval(variables, program)));
+					nls.add(new AtomicExpr(expr.eval(scope)));
 				}
 				Atom.List result = new Atom.List(nls);
 				if (result.isCharArray())
@@ -74,11 +74,11 @@ public abstract class Expr {
 		PrefixOp op;
 		Expr rhs;
 
-		public Atom eval(HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
+		public Atom eval(Scope scope) throws Exception {
 			return switch (op) {
-				case Negate -> rhs.eval(variables, program).negate();
-				case Head -> rhs.eval(variables, program).head(variables, program);
-				case Tail -> rhs.eval(variables, program).tail(variables);
+				case Negate -> rhs.eval(scope).negate();
+				case Head -> rhs.eval(scope).head(scope);
+				case Tail -> rhs.eval(scope).tail();
 			};
 		}
 
@@ -104,19 +104,19 @@ public abstract class Expr {
 		Expr lhs;
 		Expr rhs;
 
-		public Atom eval(HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
+		public Atom eval(Scope scope) throws Exception {
 			return switch (op) {
-				case Add -> lhs.eval(variables, program).add(rhs.eval(variables, program));
-				case Sub -> lhs.eval(variables, program).sub(rhs.eval(variables, program));
-				case Mul -> lhs.eval(variables, program).mul(rhs.eval(variables, program));
-				case Div -> lhs.eval(variables, program).div(rhs.eval(variables, program));
-				case Mod -> lhs.eval(variables, program).mod(rhs.eval(variables, program));
-				case LT -> lhs.eval(variables, program).lt(rhs.eval(variables, program));
-				case GT -> lhs.eval(variables, program).gt(rhs.eval(variables, program));
-				case EQ -> lhs.eval(variables, program).eq(rhs.eval(variables, program), variables, program);
-				case NEQ -> lhs.eval(variables, program).eq(rhs.eval(variables, program), variables, program).negate();
-				case And -> lhs.eval(variables, program).and(rhs.eval(variables, program));
-				case Or -> lhs.eval(variables, program).or(rhs.eval(variables, program));
+				case Add -> lhs.eval(scope).add(rhs.eval(scope));
+				case Sub -> lhs.eval(scope).sub(rhs.eval(scope));
+				case Mul -> lhs.eval(scope).mul(rhs.eval(scope));
+				case Div -> lhs.eval(scope).div(rhs.eval(scope));
+				case Mod -> lhs.eval(scope).mod(rhs.eval(scope));
+				case LT -> lhs.eval(scope).lt(rhs.eval(scope));
+				case GT -> lhs.eval(scope).gt(rhs.eval(scope));
+				case EQ -> lhs.eval(scope).eq(rhs.eval(scope), scope);
+				case NEQ -> lhs.eval(scope).eq(rhs.eval(scope), scope).negate();
+				case And -> lhs.eval(scope).and(rhs.eval(scope));
+				case Or -> lhs.eval(scope).or(rhs.eval(scope));
 			};
 		}
 
@@ -158,12 +158,12 @@ public abstract class Expr {
 		Expr lhs;
 		Expr rhs;
 
-		public Atom eval(HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
-			Atom condVal = cond.eval(variables, program);
+		public Atom eval(Scope scope) throws Exception {
+			Atom condVal = cond.eval(scope);
 			if (condVal.isTruthy()) {
-				return lhs.eval(variables, program);
+				return lhs.eval(scope);
 			} else {
-				return rhs.eval(variables, program);
+				return rhs.eval(scope);
 			}
 		}
 
@@ -190,9 +190,9 @@ public abstract class Expr {
 		Expr value;
 		ArrayList<MatchCaseExpr> cases;
 
-		public Atom eval(HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
+		public Atom eval(Scope scope) throws Exception {
 			for (MatchCaseExpr matchCase : cases) {
-				Atom.MatchCaseResult matchCaseResult = (Atom.MatchCaseResult) matchCase.eval(variables, program);
+				Atom.MatchCaseResult matchCaseResult = (Atom.MatchCaseResult) matchCase.eval(scope);
 				if (matchCaseResult.isMatch()) {
 					return matchCaseResult.getClauseValue();
 				}
@@ -222,15 +222,15 @@ public abstract class Expr {
 		Expr constraint;
 		Expr clause;
 
-		public Atom eval(HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
-			HashMap<String, Atom> clauseVariables = new HashMap<String, Atom>(variables);
-			clauseVariables.put(pattern, value.eval(variables, program));
+		public Atom eval(Scope scope) throws Exception {
+			Scope clausScope = scope.clone();
+			clausScope.set(pattern, value.eval(scope));
 			if (constraint == null) {
-				return Atom.MatchCaseResult.matched(clause.eval(clauseVariables, program));
+				return Atom.MatchCaseResult.matched(clause.eval(clausScope));
 			} else {
-				Atom constraintResult = constraint.eval(clauseVariables, program);
+				Atom constraintResult = constraint.eval(clausScope);
 				if (constraintResult.isTruthy()) {
-					return Atom.MatchCaseResult.matched(clause.eval(clauseVariables, program));
+					return Atom.MatchCaseResult.matched(clause.eval(clausScope));
 				} else {
 					return Atom.MatchCaseResult.noMatch();
 				}
@@ -258,30 +258,29 @@ public abstract class Expr {
 		String name;
 		ArrayList<Expr> variables;
 
-		public Atom eval(HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
-			HashMap<String, Atom> evaledVariables = new HashMap<>();
-			evaledVariables.putAll(variables);
+		public Atom eval(Scope scope) throws Exception {
+			Scope evaledScope = scope.clone();
+			// HashMap<String, Atom> evaledVariables = new HashMap<>();
+			// evaledVariables.putAll(variables);
 
-			Atom.Lambda lambda = ((Atom.Lambda) evaledVariables.get(this.name));
+			Atom.Lambda lambda = ((Atom.Lambda) scope.get(this.name));
 			if (lambda != null)
-				return evalLambda(lambda, evaledVariables, variables, program);
-			ProgramFunction pf = program.get(this.name);
+				return evalLambda(lambda, evaledScope);
+			ProgramFunction pf = scope.getProgramFunction(this.name);
 			if (pf != null)
-				return evalProgFunc(pf, evaledVariables, variables, program);
+				return evalProgFunc(pf, evaledScope);
 			throw new Exception(String.format("Undefined function '%s'", this.name));
 		}
 
-		public Atom evalProgFunc(ProgramFunction pf, HashMap<String, Atom> evaledVariables,
-				HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
+		public Atom evalProgFunc(ProgramFunction pf, Scope evaledScope) throws Exception {
 			ArrayList<Atom> args = new ArrayList<>();
 			for (Expr expr : this.variables) {
-				args.add(expr.eval(evaledVariables, program));
+				args.add(expr.eval(evaledScope));
 			}
 			return pf.call(args);
 		}
 
-		public Atom evalLambda(Atom.Lambda lambda, HashMap<String, Atom> evaledVariables,
-				HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
+		public Atom evalLambda(Atom.Lambda lambda, Scope evaledScope) throws Exception {
 			for (Map.Entry<java.lang.Integer, LambdaVariation> lambdaVariation : lambda.variations.entrySet()) {
 				int arity = lambdaVariation.getKey();
 
@@ -289,12 +288,13 @@ public abstract class Expr {
 					LambdaVariation variation = lambdaVariation.getValue();
 					ArrayList<String> argNames = variation.argNames;
 					for (int i = 0; i < argNames.size(); i += 1) {
-						evaledVariables.put(argNames.get(i), this.variables.get(i).eval(variables, program));
+						evaledScope.set(argNames.get(i), this.variables.get(i).eval(evaledScope));
 					}
-					return variation.expr.eval(evaledVariables, program);
+					return variation.expr.eval(evaledScope);
 				}
 			}
-			throw new Exception(String.format("Could not find function variation matching %s/%s.", name, this.variables.size()));
+			throw new Exception(
+					String.format("Could not find function variation matching %s/%s.", name, this.variables.size()));
 		}
 
 		public LambdaCall(String name, int startIndex, int endIndex) {
@@ -328,8 +328,8 @@ public abstract class Expr {
 		String lhs;
 		Expr rhs;
 
-		public Atom eval(HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
-			variables.put(lhs, rhs.eval(variables, program));
+		public Atom eval(Scope scope) throws Exception {
+			scope.set(lhs, rhs.eval(scope));
 			return new Atom.Unit();
 		}
 
@@ -354,17 +354,17 @@ public abstract class Expr {
 		String lhs;
 		Expr rhs;
 
-		public Atom eval(HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
-			Atom variationValue = rhs.eval(variables, program);
+		public Atom eval(Scope scope) throws Exception {
+			Atom variationValue = rhs.eval(scope);
 			if (variationValue instanceof Atom.Lambda) {
-				if (variables.containsKey(lhs)) {
+				if (scope.has(lhs)) {
 					// Add the new variation
-					Atom lambda = variables.get(lhs);
+					Atom lambda = scope.get(lhs);
 					if (lambda instanceof Atom.Lambda) {
-						LambdaVariation lambdaVariation = ((Atom.Lambda)variationValue).variations.values().iterator().next();
-						((Atom.Lambda)lambda).addVariation(lambdaVariation.expr, lambdaVariation.argNames);
-					}
-					else {
+						LambdaVariation lambdaVariation = ((Atom.Lambda) variationValue).variations.values().iterator()
+								.next();
+						((Atom.Lambda) lambda).addVariation(lambdaVariation.expr, lambdaVariation.argNames);
+					} else {
 						throw new Exception("Cannot add variation to any other than functions");
 					}
 				} else {
@@ -392,51 +392,50 @@ public abstract class Expr {
 		// instead of a potentially cyclic graph it *is* possible to test them all
 		// individually
 
-		HashMap<String, Atom> emptyScope = new HashMap<>();
-		HashMap<String, ProgramFunction> emptyProgram = new HashMap<>();
+		Scope emptyScope = new GlobalScope();
 
 		AtomicExpr e1 = new AtomicExpr(new Atom.Integer(1));
-		assert ((Atom.Integer) e1.eval(emptyScope, emptyProgram)).val == 1;
+		assert ((Atom.Integer) e1.eval(emptyScope)).val == 1;
 
-		HashMap<String, Atom> piScope = new HashMap<>();
-		piScope.put("pi", new Atom.Integer(3));
+		Scope piScope = new GlobalScope();
+		piScope.set("pi", new Atom.Integer(3));
 		AtomicExpr e2 = new AtomicExpr(new Atom.Ident("pi"));
-		assert ((Atom.Integer) e2.eval(piScope, emptyProgram)).val == 3;
+		assert ((Atom.Integer) e2.eval(piScope)).val == 3;
 
 		PrefixExpr e3 = new PrefixExpr(PrefixOp.Negate, new AtomicExpr(new Atom.Integer(3)));
-		assert ((Atom.Integer) e3.eval(emptyScope, emptyProgram)).val == -3;
+		assert ((Atom.Integer) e3.eval(emptyScope)).val == -3;
 
 		BinaryExpr e4 = new BinaryExpr(BinOp.Add, new Atom.Integer(10), new Atom.Integer(20));
-		assert ((Atom.Integer) e4.eval(emptyScope, emptyProgram)).val == 30;
+		assert ((Atom.Integer) e4.eval(emptyScope)).val == 30;
 
 		IfExpr e5 = new IfExpr(new AtomicExpr(new Atom.Bool(false)), new AtomicExpr(new Atom.Integer(10)),
 				new AtomicExpr(new Atom.Integer(20)));
-		assert ((Atom.Integer) e5.eval(emptyScope, emptyProgram)).val == 20;
+		assert ((Atom.Integer) e5.eval(emptyScope)).val == 20;
 
 		IfExpr e6 = new IfExpr(new AtomicExpr(new Atom.Bool(true)), new AtomicExpr(new Atom.Integer(10)),
 				new AtomicExpr(new Atom.Integer(20)));
-		assert ((Atom.Integer) e6.eval(emptyScope, emptyProgram)).val == 10;
+		assert ((Atom.Integer) e6.eval(emptyScope)).val == 10;
 
-		HashMap<String, Atom> lambdaScope = new HashMap<>();
+		Scope lambdaScope = new GlobalScope();
 
 		AtomicExpr fib = (AtomicExpr) Parser.parseExpr("fn (n) => if (n < 2) then (1) else (fib(n - 1) + fib(n - 2))");
 		AtomicExpr add = (AtomicExpr) Parser.parseExpr("fn (start, end) => start + end");
 
-		lambdaScope.put("fib", fib.val);
-		lambdaScope.put("add", add.val);
+		lambdaScope.set("fib", fib.val);
+		lambdaScope.set("add", add.val);
 
 		LambdaCall e7 = (LambdaCall) Parser.parseExpr("fib(10)");
 		LambdaCall e8 = (LambdaCall) Parser.parseExpr("add(5, 10)");
-		assert ((Atom.Integer) e7.eval(lambdaScope, emptyProgram)).val == 89;
-		assert ((Atom.Integer) e8.eval(lambdaScope, emptyProgram)).val == 15;
+		assert ((Atom.Integer) e7.eval(lambdaScope)).val == 89;
+		assert ((Atom.Integer) e8.eval(lambdaScope)).val == 15;
 
-		HashMap<String, Atom> newScope = new HashMap<>();
+		Scope newScope = new GlobalScope();
 
 		AssignExpr e9 = (AssignExpr) Parser.parseExpr("let x = 15");
-		e9.eval(newScope, emptyProgram);
+		e9.eval(newScope);
 		assert ((Atom.Integer) newScope.get("x")).val == 15;
 		AssignExpr e10 = (AssignExpr) Parser.parseExpr("let x = x * x");
-		e10.eval(newScope, emptyProgram);
+		e10.eval(newScope);
 		assert ((Atom.Integer) newScope.get("x")).val == 15 * 15;
 	}
 }

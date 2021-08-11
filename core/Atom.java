@@ -8,16 +8,16 @@ import core.formatting.EscapeSequence;
 /**
  * @author Mikail Khan <mikail@mikail-khan.com>
  *
- *          An Atom is any discrete variable, literal or not
+ *         An Atom is any discrete variable, literal or not
  *
- *          <p>
- *          It's worth noting that this is a significant reason why the
- *          interpreter is so slow; each Atom has a whole lot of space and time
- *          overhead because of how Java stores things. Because of this
- *          optimization is not a priority. To get around this, we could use a
- *          bytecode interpreter which would be orders of magnitude faster but a
- *          bit more complex.
- *          </p>
+ *         <p>
+ *         It's worth noting that this is a significant reason why the
+ *         interpreter is so slow; each Atom has a whole lot of space and time
+ *         overhead because of how Java stores things. Because of this
+ *         optimization is not a priority. To get around this, we could use a
+ *         bytecode interpreter which would be orders of magnitude faster but a
+ *         bit more complex.
+ *         </p>
  */
 public abstract class Atom {
 	public static class Integer extends Atom {
@@ -90,7 +90,9 @@ public abstract class Atom {
 
 		/**
 		 * Convert list of characters to string
-		 * @param escapeCharacters Whether to show escaping of special characters using backslash notation
+		 *
+		 * @param escapeCharacters Whether to show escaping of special characters using
+		 *                         backslash notation
 		 * @return
 		 */
 		public String getStringValue(boolean escapeCharacters) {
@@ -99,8 +101,7 @@ public abstract class Atom {
 				char c = ((Atom.Char) ((Expr.AtomicExpr) list.get(i)).val).val;
 				if (escapeCharacters) {
 					result += EscapeSequence.escape(c);
-				}
-				else {
+				} else {
 					result += c;
 				}
 			}
@@ -160,7 +161,8 @@ public abstract class Atom {
 		}
 
 		public String toString() {
-			return String.format("Lambda [\n\t%s\n]", String.join(",\n\t", variations.values().stream().map(LambdaVariation::toString).toList()));
+			return String.format("Lambda [\n\t%s\n]",
+					String.join(",\n\t", variations.values().stream().map(LambdaVariation::toString).toList()));
 		}
 
 		public static class LambdaVariation {
@@ -287,7 +289,7 @@ public abstract class Atom {
 			return new Float(((Integer) this).val * ((Float) rhs).val);
 		} else if ((this instanceof Float) && (rhs instanceof Float)) {
 			return new Float(((Float) this).val * ((Float) rhs).val);
-		}else {
+		} else {
 			throw new Exception("Bad Mul");
 		}
 	}
@@ -301,7 +303,7 @@ public abstract class Atom {
 			return new Float(((Integer) this).val / ((Float) rhs).val);
 		} else if ((this instanceof Float) && (rhs instanceof Float)) {
 			return new Float(((Float) this).val / ((Float) rhs).val);
-		}else {
+		} else {
 			throw new Exception("Bad Div");
 		}
 	}
@@ -334,8 +336,7 @@ public abstract class Atom {
 		}
 	}
 
-	public Atom eq(Atom rhs, HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program)
-			throws Exception {
+	public Atom eq(Atom rhs, Scope scope) throws Exception {
 		if ((this instanceof Integer) && (rhs instanceof Integer)) {
 			return (Atom) new Bool(((Integer) this).val == ((Integer) rhs).val);
 		} else if (this instanceof Bool || rhs instanceof Bool) {
@@ -348,9 +349,9 @@ public abstract class Atom {
 			if (lhs.list.size() != other.list.size())
 				return (Atom) new Bool(false);
 			for (int i = 0; i < lhs.list.size(); i++) {
-				Atom first = lhs.list.get(i).eval(variables, program);
-				Atom second = other.list.get(i).eval(variables, program);
-				if (!first.eq(second, variables, program).isTruthy())
+				Atom first = lhs.list.get(i).eval(scope);
+				Atom second = other.list.get(i).eval(scope);
+				if (!first.eq(second, scope).isTruthy())
 					return (Atom) new Bool(false);
 			}
 			return (Atom) new Bool(true);
@@ -371,16 +372,16 @@ public abstract class Atom {
 		}
 	}
 
-	public Atom head(HashMap<String, Atom> variables, HashMap<String, ProgramFunction> program) throws Exception {
+	public Atom head(Scope scope) throws Exception {
 		if (this instanceof List) {
 			List ls = (List) this;
-			return (Atom) ls.list.get(0).eval(variables, program);
+			return (Atom) ls.list.get(0).eval(scope);
 		} else {
 			throw new Exception("Bad Head");
 		}
 	}
 
-	public Atom tail(HashMap<String, Atom> variables) throws Exception {
+	public Atom tail() throws Exception {
 		if (this instanceof List) {
 			List ls = (List) this;
 			ArrayList<Expr> nls = new ArrayList<>(ls.list.subList(1, ls.list.size()));

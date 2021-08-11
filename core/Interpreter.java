@@ -3,23 +3,21 @@ package core;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
-import java.util.function.Function;
 
 /**
- * @author Mikail Khan <mikail@mikail-khan.com>, William Rågstad <william.ragstad@gmail.com>
+ * @author Mikail Khan <mikail@mikail-khan.com>, William Rågstad
+ *         <william.ragstad@gmail.com>
  *
- *          Because this is an expression based language we don't need to deal
- *          with complicated scoping and whatnot. This keeps the interpreter
- *          very simple.
+ *         Because this is an expression based language we don't need to deal
+ *         with complicated scoping and whatnot. This keeps the interpreter very
+ *         simple.
  *
  */
 public class Interpreter {
-	HashMap<String, Atom> globals;
-	HashMap<String, ProgramFunction> program; // Built in system functions
+	private GlobalScope globalScope;
 
 	public Interpreter() throws Exception {
-		globals = new HashMap<>();
-		program = new HashMap<>();
+		globalScope = new GlobalScope();
 		// load built-ins
 		loadProgram();
 	}
@@ -55,7 +53,7 @@ public class Interpreter {
 		String parseInt = GenerateKernelName("parseInt");
 		String parseBool = GenerateKernelName("parseBool");
 		// TODO: Allow print functions to accept any number of arguments
-		program.put(print, (args) -> {
+		globalScope.addProgramFunction(print, (args) -> {
 			expectArgs.apply(args, 1, "print");
 			Atom val = args.get(0); // eval?
 			if (val instanceof Atom.Str)
@@ -66,7 +64,7 @@ public class Interpreter {
 				System.out.print(val.toString());
 			return new Atom.Unit();
 		});
-		program.put(input, (args) -> {
+		globalScope.addProgramFunction(input, (args) -> {
 			expectArgs.apply(args, 1, "input");
 			Atom textAtom = args.get(0); // args.get(0).eval(globals, program)
 			if (!(textAtom instanceof Atom.Str || textAtom instanceof Atom.Char))
@@ -81,36 +79,36 @@ public class Interpreter {
 			String inputVal = in.nextLine();
 			return new Atom.Str(inputVal);
 		});
-		program.put(typeof, (args) -> {
+		globalScope.addProgramFunction(typeof, (args) -> {
 			expectArgs.apply(args, 1, "typeof");
 			return new Atom.Str(args.get(0).getClass().getSimpleName());
 		});
-		program.put(upper, (args) -> {
+		globalScope.addProgramFunction(upper, (args) -> {
 			expectArgs.apply(args, 1, "upper");
 			expectType.apply(args.get(0), Atom.Str.class, "upper");
 			return new Atom.Str(((Atom.Str) args.get(0)).getStringValue(false).toUpperCase());
 		});
-		program.put(lower, (args) -> {
+		globalScope.addProgramFunction(lower, (args) -> {
 			expectArgs.apply(args, 1, "lower");
 			expectType.apply(args.get(0), Atom.Str.class, "lower");
 			return new Atom.Str(((Atom.Str) args.get(0)).getStringValue(false).toLowerCase());
 		});
-		program.put(round, (args) -> {
+		globalScope.addProgramFunction(round, (args) -> {
 			expectArgs.apply(args, 1, "round");
 			expectType.apply(args.get(0), Atom.Float.class, "round");
 			return new Atom.Integer((int) Math.round(((Atom.Float) args.get(0)).val));
 		});
-		program.put(floor, (args) -> {
+		globalScope.addProgramFunction(floor, (args) -> {
 			expectArgs.apply(args, 1, "floor");
 			expectType.apply(args.get(0), Atom.Float.class, "floor");
-			return new Atom.Integer((int)((Atom.Float) args.get(0)).val);
+			return new Atom.Integer((int) ((Atom.Float) args.get(0)).val);
 		});
-		program.put(ceil, (args) -> {
+		globalScope.addProgramFunction(ceil, (args) -> {
 			expectArgs.apply(args, 1, "ceil");
 			expectType.apply(args.get(0), Atom.Float.class, "ceil");
 			return new Atom.Integer((int) Math.ceil(((Atom.Float) args.get(0)).val));
 		});
-		program.put(substr, (args) -> {
+		globalScope.addProgramFunction(substr, (args) -> {
 			expectArgs.apply(args, 3, "substr");
 			expectType.apply(args.get(0), Atom.Str.class, "substr");
 			expectType.apply(args.get(1), Atom.Integer.class, "substr");
@@ -120,7 +118,7 @@ public class Interpreter {
 			return new Atom.Str(((Atom.Str) args.get(0)).getStringValue(false).substring(start, end));
 		});
 		// Parsing
-		program.put(parseInt, (args) -> {
+		globalScope.addProgramFunction(parseInt, (args) -> {
 			expectArgs.apply(args, 1, "parseInt");
 			expectType.apply(args.get(0), Atom.Str.class, "parseInt");
 			try {
@@ -129,7 +127,7 @@ public class Interpreter {
 				return new Atom.Unit();
 			}
 		});
-		program.put(parseBool, (args) -> {
+		globalScope.addProgramFunction(parseBool, (args) -> {
 			expectArgs.apply(args, 1, "parseBool");
 			expectType.apply(args.get(0), Atom.Str.class, "parseBool");
 			String val = ((Atom.Str) args.get(0)).getStringValue(false).trim().toLowerCase();
@@ -177,8 +175,7 @@ public class Interpreter {
 	 * reused for running a new program.
 	 */
 	public void clear() {
-		globals.clear();
-		program.clear();
+		globalScope.clear();
 		// load built-ins
 		try {
 			loadProgram();
@@ -190,7 +187,7 @@ public class Interpreter {
 	}
 
 	public Atom eval(String expr) throws Exception {
-		return Parser.parseExpr(expr).eval(globals, program);
+		return Parser.parseExpr(expr).eval(globalScope);
 	}
 
 	public void execute(String expr) throws Exception {
@@ -213,7 +210,7 @@ public class Interpreter {
 		// implementation
 		ArrayList<Atom> results = new ArrayList<>();
 		for (int i = 0; i < exprs.length; i++) {
-			results.add(exprs[i].eval(this.globals, this.program));
+			results.add(exprs[i].eval(globalScope));
 		}
 		Atom[] ret = new Atom[results.size()];
 		ret = results.toArray(ret);
