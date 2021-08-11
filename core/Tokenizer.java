@@ -70,10 +70,20 @@ public class Tokenizer {
 		addToken(new Token(ty, lexeme, position, lexeme.length(), line, column));
 	}
 
-	private void scanIdent() {
+	private void scanIdent() throws Exception {
 		int start = position;
+		boolean expectIdentChar = false;
 		while (!isFinished() && (Character.isAlphabetic(peek()) || Character.isDigit(peek()) || peek() == '_')) {
 			eat();
+			expectIdentChar = false;
+			if (!isFinished() && peek() == '.') {
+				eat();
+				expectIdentChar = true;
+			}
+		}
+
+		if (expectIdentChar) {
+			throw new Exception(error("Expected identifier"));
 		}
 
 		String lexeme = input.substring(start, position);
@@ -91,7 +101,15 @@ public class Tokenizer {
 			case "false" -> addToken(TokenTy.False, lexeme);
 			case "match" -> addToken(TokenTy.Match, lexeme);
 			case "and" -> addToken(TokenTy.MatchCaseCond, lexeme);
-			default -> addToken(TokenTy.Ident, lexeme);
+			case "mod" -> addToken(TokenTy.Module, lexeme);
+			case "pub" -> addToken(TokenTy.Pub, lexeme);
+			default -> {
+				if (lexeme.indexOf('.') > 0) {
+					addToken(TokenTy.IdentList, lexeme);
+				} else {
+					addToken(TokenTy.Ident, lexeme);
+				}
+			}
 		}
 	}
 
@@ -214,10 +232,11 @@ public class Tokenizer {
 				}
 			}
 			case '.' -> {
-				if (expect('.')) {
+				if (!isFinished() && expect('.')) {
 					addToken(TokenTy.DotDot, "..");
 				} else {
-					throw new Exception(error("Found a single '.', did you mean '..'?"));
+					addToken(TokenTy.Dot, '.');
+					// throw new Exception(error("Found a single '.', did you mean '..'?"));
 				}
 			}
 			case '=' -> {

@@ -11,22 +11,22 @@ import core.Interpreter;
 /**
  * @author William Rågstad <william.ragstad@gmail.com>
  *
- *          The Runner takes a set of input source code files as command line
- *          argument, and interprets them by expression. Even if one file fails
- *          to execute, the rest will.
+ *         The Runner takes a set of input source code files as command line
+ *         argument, and interprets them by expression. Even if one file fails
+ *         to execute, the rest will.
  *
  */
 public class Runner {
 	public static void main(String[] args) throws Exception {
-		// args = new String[] { "test\\input4.rs" };
+		// args = new String[] { "test\\input8.rs" };
 		if (args.length == 0) {
 			System.out.println("Usage: Runner [file(s)]");
 			return;
 		}
-        run(Arrays.asList(args));
+		run(Arrays.asList(args));
 	}
 
-    public static void run(List<String> files) {
+	public static void run(List<String> files) {
 		Interpreter i;
 		try {
 			i = new Interpreter();

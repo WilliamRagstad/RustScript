@@ -43,7 +43,7 @@ public class Token {
 enum TokenTy {
 	LParen, RParen, LBracket, RBracket, LCurlyBracket, RCurlyBracket,
 
-	Ident, Integer, Float, Character, String, True, False,
+	Ident, IdentList, Integer, Float, Character, String, True, False,
 
 	Add, Sub, Mul, Div, Mod,
 
@@ -53,13 +53,13 @@ enum TokenTy {
 
 	If, Then, Else, Match, MatchCase, MatchCaseCond,
 
-	Let, Assign, Variation, Comma,
+	Let, Assign, Variation, Comma, Module, Pub,
 
 	Caret, Dollar,
 
 	Fn, Arrow,
 
-	For, In, DotDot,
+	For, In, Dot, DotDot,
 
 	SColon, NL, EOF
 }

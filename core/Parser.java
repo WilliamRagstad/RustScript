@@ -1,7 +1,9 @@
 package core;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
+import core.Atom.IdentList;
 import core.Expr.MatchCaseExpr;
 
 /**
@@ -114,6 +116,19 @@ public class Parser {
 		return parseIfExpr(Token.EOF(position, line, column));
 	}
 
+	private Expr parseModuleExpr(Token nx) throws Exception {
+		Expr name = exprBP(0);
+		if (!(name instanceof Expr.AtomicExpr && ((Expr.AtomicExpr) name).val instanceof Atom.Ident)) {
+			throw new Exception(error(nx, "Expected module name, got " + name.toString()));
+		}
+		nx = peek();
+		if (nx.ty != TokenTy.LCurlyBracket) {
+			throw new Exception(error(nx, "Expected module body"));
+		}
+		Expr.BlockExpr block = (Expr.BlockExpr) parseBlock(nx);
+		return new Expr.ModuleExpr(name.toString(), block.getExprs(), nx.index, block.endIndex);
+	}
+
 	private Expr parseMatchExpr(Token nx) throws Exception {
 		Expr value = exprBP(0);
 		ArrayList<MatchCaseExpr> cases = new ArrayList<>();
@@ -171,7 +186,7 @@ public class Parser {
 				args.add(new Expr.AtomicExpr(mapLambda));
 				args.add(list);
 
-				Expr fmap = new Expr.LambdaCall("fmap", args);
+				Expr fmap = new Expr.LambdaCall(new Atom.Ident("fmap"), args);
 
 				if (expect(TokenTy.If)) {
 					Expr cond = exprBP(0);
@@ -182,7 +197,7 @@ public class Parser {
 					filterArgs.add(fmap);
 
 					assertNext(TokenTy.RBracket);
-					return new Expr.LambdaCall("filter", filterArgs);
+					return new Expr.LambdaCall(new Atom.Ident("filter"), filterArgs);
 				} else {
 					assertNext(TokenTy.RBracket);
 					return fmap;
@@ -198,7 +213,7 @@ public class Parser {
 				args.add(end);
 
 				assertNext(TokenTy.RBracket);
-				return new Expr.LambdaCall("range", args);
+				return new Expr.LambdaCall(new Atom.Ident("range"), args);
 			} else {
 				// array literal
 				ArrayList<Expr> out = new ArrayList<>();
@@ -225,8 +240,31 @@ public class Parser {
 	}
 
 	private Expr parseBlock(Token nx) throws Exception {
-		ArrayList<Expr> exprs = this.exprBPs(0, true, TokenTy.RCurlyBracket);
-		return new Expr.BlockExpr(exprs, nx.index, exprs.get(exprs.size() - 1).endIndex);
+		/*
+		 * assertNext(TokenTy.LCurlyBracket); ArrayList<Expr> exprs = new ArrayList<>();
+		 * while (peek().ty != TokenTy.RCurlyBracket) { exprs.add(exprBP(0)); } Token t
+		 * = peek(); assertNext(TokenTy.RCurlyBracket);
+		 */
+		assertNext(TokenTy.LCurlyBracket);
+		ArrayList<Expr> exprs = exprBPs(0, true, TokenTy.RCurlyBracket);
+		Token blockEnd = peek();
+		assertNext(TokenTy.RCurlyBracket);
+		return new Expr.BlockExpr(exprs, nx.index, blockEnd.index);
+	}
+
+	private ArrayList<String> parseDotIdentifierList(Token nx) throws Exception {
+		if (nx.ty != TokenTy.Ident) {
+			throw new Exception(error(nx, "Expected an identifier."));
+		}
+		ArrayList<String> identifiers = new ArrayList<>();
+		identifiers.add(nx.lexeme);
+		while (peek().ty == TokenTy.Ident) {
+			identifiers.add(eat().lexeme);
+			if (peek().ty != TokenTy.Dot) {
+				break;
+			}
+		}
+		return identifiers;
 	}
 
 	private ArrayList<Expr> parseCallArgs() throws Exception {
@@ -258,6 +296,11 @@ public class Parser {
 
 	private Expr parseLetExpr() throws Exception {
 		return parseLetExpr(Token.EOF(position, line, column));
+	}
+
+	private Expr parsePublicExpr(Token nx) throws Exception {
+		Expr expr = exprBP(0);
+		return new Expr.PublicExpr(expr, nx.index, expr.endIndex);
 	}
 
 	private Expr parseVariationExpr(Token nx) throws Exception {
@@ -317,19 +360,33 @@ public class Parser {
 				if (peek().ty == TokenTy.LParen) {
 					ArrayList<Expr> vars = parseCallArgs();
 					if (vars.size() > 0)
-						yield new Expr.LambdaCall(nx.lexeme, vars, vars.get(0).startIndex,
+						yield new Expr.LambdaCall(new Atom.Ident(nx.lexeme), vars, vars.get(0).startIndex,
 								vars.get(vars.size() - 1).endIndex);
-					yield new Expr.LambdaCall(nx.lexeme, vars);
+					yield new Expr.LambdaCall(new Atom.Ident(nx.lexeme), vars);
 				} else {
 					yield new Expr.AtomicExpr(new Atom.Ident(nx.lexeme), s, s + nx.lexeme.length());
+				}
+			}
+			case IdentList -> {
+				String[] identifiers = nx.lexeme.split("\\.");
+				if (peek().ty == TokenTy.LParen) {
+					ArrayList<Expr> vars = parseCallArgs();
+					if (vars.size() > 0)
+						yield new Expr.LambdaCall(new Atom.IdentList(identifiers), vars, vars.get(0).startIndex,
+								vars.get(vars.size() - 1).endIndex);
+					yield new Expr.LambdaCall(new Atom.IdentList(identifiers), vars);
+				} else {
+					yield new Expr.AtomicExpr(new Atom.IdentList(identifiers), s, s + nx.lexeme.length());
 				}
 			}
 			case Character -> new Expr.AtomicExpr(new Atom.Char(nx.lexeme.charAt(0)), s, s + nx.lexeme.length());
 			case String -> new Expr.AtomicExpr(new Atom.Str(nx.lexeme), s, s + nx.lexeme.length());
 			case Let -> parseLetExpr(nx);
+			case Pub -> parsePublicExpr(nx);
 			case Variation -> parseVariationExpr(nx);
 			case Fn -> parseLambdaExpr(nx);
 			case If -> parseIfExpr(nx);
+			case Module -> parseModuleExpr(nx);
 			case Match -> parseMatchExpr(nx);
 			case LBracket -> parseList(nx);
 			case LParen -> {
@@ -402,26 +459,23 @@ public class Parser {
 		return this.exprBPs(minBP, allowWhiteSpace, null);
 	}
 
-	// Todo: Add delmiter TokenTy parameter to allow for different delmiters than
-	// ';' and '\n'.
 	private ArrayList<Expr> exprBPs(int minBP, boolean allowWhiteSpace, TokenTy closing) throws Exception {
 		ArrayList<Expr> exprs = new ArrayList<>();
 		Token n;
+		Token s = peek(false);
 		while (!isFinished()) {
+			if (closing != null && (s.ty == closing || peek(true).ty == closing)) {
+				break;
+			}
 			Expr e = exprBP(0, true);
 			exprs.add(e);
 			n = peek(false);
-			if (n.ty == TokenTy.EOF)
+			if (n.ty == TokenTy.EOF || (closing != null && n.ty == closing))
 				break;
-			else if (n.ty != TokenTy.SColon && n.ty != TokenTy.NL)
+			if (!(n.ty == TokenTy.SColon || n.ty == TokenTy.NL))
 				throw new Exception(error(n,
 						"Unexpected end of expression! Must have an ending ';' or newline till next expression."));
-			eat(false); // Eat n, the separating '\n' or ';'
-			n = peek(true);
-			if (closing != null && n.ty == closing) {
-				eat(true);
-				break;
-			}
+			s = eat(false); // Eat n, the separating '\n' or ';'
 		}
 		return exprs;
 	}

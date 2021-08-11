@@ -35,9 +35,16 @@ public abstract class Expr {
 		public Atom eval(Scope scope) throws Exception {
 			if (val instanceof Atom.Ident) {
 				Atom.Ident v = (Atom.Ident) val;
-				var res = scope.get(v.name);
+				Atom res = scope.get(v.name);
 				if (res == null) {
-					throw new Exception(String.format("Tried to access nonexistent variable %s", v.name));
+					throw new Exception(String.format("Tried to access nonexistent variable %s", v.toString()));
+				}
+				return res;
+			} else if (val instanceof Atom.IdentList) {
+				Atom.IdentList v = (Atom.IdentList) val;
+				Atom res = scope.find(v.getIdentifiers());
+				if (res == null) {
+					throw new Exception(String.format("Tried to access nonexistent variable %s", v.toString()));
 				}
 				return res;
 			} else if (val instanceof Atom.List && !(val instanceof Atom.Str)) {
@@ -175,6 +182,10 @@ public abstract class Expr {
 			this.exprs = exprs;
 		}
 
+		public ArrayList<Expr> getExprs() {
+			return exprs;
+		}
+
 		public String toString() {
 			return String.format("{\n\t%s\n}", String.join(";\n\t", exprs.stream().map(Expr::toString).toList()));
 		}
@@ -281,20 +292,58 @@ public abstract class Expr {
 		}
 	}
 
+	// TODO: Somehow restrict access to the private scope
+	public static class ModuleExpr extends Expr {
+		public String name;
+		public ArrayList<Expr> body;
+
+		public Atom eval(Scope scope) throws Exception {
+			Scope publicScope = scope.deriveNew();
+			Scope privateScope = publicScope.deriveNew();
+			publicScope.setSharedScope(privateScope); // Add circular dependency back to public scope
+			for (Expr expr : this.body) {
+				if (expr instanceof Expr.PublicExpr) {
+					expr.eval(publicScope);
+				} else {
+					expr.eval(privateScope);
+				}
+			}
+			scope.set(this.name, new Atom.Module(name, body, publicScope, privateScope));
+			return new Atom.Unit();
+		}
+
+		public ModuleExpr(String name, ArrayList<Expr> body, int startIndex, int endIndex) {
+			super(startIndex, endIndex);
+			this.name = name;
+			this.body = body;
+		}
+
+		public String toString() {
+			return String.format("mod %s {\n\t%s\n}", name,
+					String.join(",\n\t", body.stream().map(Expr::toString).toList()));
+		}
+	}
+
 	public static class LambdaCall extends Expr {
-		String name;
+		Atom identifier;
 		ArrayList<Expr> variables;
 
 		public Atom eval(Scope scope) throws Exception {
 			Scope evaledScope = scope.deriveNew();
 
-			Atom.Lambda lambda = ((Atom.Lambda) scope.get(this.name));
-			if (lambda != null)
+			Atom.Lambda lambda = ((Atom.Lambda) scope.getByIdent(this.identifier));
+			if (lambda != null) {
 				return evalLambda(lambda, evaledScope);
-			ProgramFunction pf = scope.getProgramFunction(this.name);
+			}
+			if (!(this.identifier instanceof Atom.Ident)) {
+				throw new Exception(
+						"Cannot call built in function '" + identifier.toString() + "', must be single identifier");
+			}
+			String progFuncName = ((Atom.Ident) this.identifier).name;
+			ProgramFunction pf = scope.getProgramFunction(progFuncName);
 			if (pf != null)
 				return evalProgFunc(pf, evaledScope);
-			throw new Exception(String.format("Undefined function '%s'", this.name));
+			throw new Exception(String.format("Undefined builtin function '%s'", progFuncName));
 		}
 
 		public Atom evalProgFunc(ProgramFunction pf, Scope evaledScope) throws Exception {
@@ -318,34 +367,30 @@ public abstract class Expr {
 					return variation.expr.eval(evaledScope);
 				}
 			}
-			throw new Exception(
-					String.format("Could not find function variation matching %s/%s.", name, this.variables.size()));
+			throw new Exception(String.format("Could not find function variation matching %s/%s.",
+					identifier.toString(), this.variables.size()));
 		}
 
-		public LambdaCall(String name, int startIndex, int endIndex) {
+		public LambdaCall(Atom identifier, ArrayList<Expr> variables, int startIndex, int endIndex) {
 			super(startIndex, endIndex);
-			this.name = name;
-		}
-
-		public LambdaCall(String name) {
-			super(-1, -1);
-			this.name = name;
-		}
-
-		public LambdaCall(String name, ArrayList<Expr> variables, int startIndex, int endIndex) {
-			super(startIndex, endIndex);
-			this.name = name;
+			this.identifier = identifier;
 			this.variables = variables;
 		}
 
-		public LambdaCall(String name, ArrayList<Expr> variables) {
-			super(-1, -1);
-			this.name = name;
-			this.variables = variables;
+		public LambdaCall(Atom identifier, int startIndex, int endIndex) {
+			this(identifier, new ArrayList<>(), startIndex, endIndex);
+		}
+
+		public LambdaCall(Atom identifier, ArrayList<Expr> variables) {
+			this(identifier, variables, -1, -1);
+		}
+
+		public LambdaCall(Atom identifier) {
+			this(identifier, new ArrayList<>());
 		}
 
 		public String toString() {
-			return String.format("%s(%s)", name, variables.toString());
+			return String.format("%s(%s)", identifier.toString(), variables.toString());
 		}
 	}
 
@@ -409,6 +454,28 @@ public abstract class Expr {
 
 		public String toString() {
 			return String.format("var %s = %s", lhs, rhs.toString());
+		}
+	}
+
+	public static class PublicExpr extends Expr {
+		Expr expr;
+
+		public Atom eval(Scope scope) throws Exception {
+			return expr.eval(scope);
+		}
+
+		public PublicExpr(Expr expr, int startIndex, int endIndex) {
+			super(startIndex, endIndex);
+			this.expr = expr;
+		}
+
+		public PublicExpr(Expr expr) {
+			super(-1, -1);
+			this.expr = expr;
+		}
+
+		public String toString() {
+			return String.format("pub %s", expr.toString());
 		}
 	}
 

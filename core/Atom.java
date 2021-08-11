@@ -145,6 +145,53 @@ public abstract class Atom {
 		}
 	}
 
+	public static class IdentList extends Atom {
+		public ArrayList<String> identifiers;
+
+		public IdentList(String... identifiers) {
+			this.identifiers = new ArrayList<>(identifiers.length);
+			for (String id : identifiers) {
+				this.identifiers.add(id);
+			}
+		}
+
+		public IdentList(ArrayList<String> identifiers) {
+			this.identifiers = identifiers;
+		}
+
+		public String[] getIdentifiers() {
+			String[] ids = new String[identifiers.size()];
+			return identifiers.toArray(ids);
+		}
+
+		public String toString() {
+			return String.join(".", identifiers);
+		}
+	}
+
+	public static class Module extends Atom {
+		public String name;
+		public ArrayList<Expr> body;
+		private Scope publicScope;
+		private Scope privateScope;
+
+		public Module(String name, ArrayList<Expr> body, Scope publicScope, Scope privateScope) throws Exception {
+			this.name = name;
+			this.publicScope = publicScope;
+			this.privateScope = privateScope;
+			this.body = body;
+		}
+
+		public Scope getPublicScope() {
+			return publicScope;
+		}
+
+		public String toString() {
+			return String.format("Module { name: %s, public: %s, private: %s }", name, publicScope.toString(),
+					privateScope.toString());
+		}
+	}
+
 	public static class Lambda extends Atom {
 		public HashMap<java.lang.Integer, LambdaVariation> variations;
 
