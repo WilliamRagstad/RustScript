@@ -57,6 +57,9 @@ public abstract class Expr {
 				if (result.isCharArray())
 					return new Atom.Str(result.getStringValue(false));
 				return result;
+			} else if (val instanceof Atom.Lambda) {
+				((Atom.Lambda) val).setScope(scope);
+				return val;
 			} else {
 				return val;
 			}
@@ -164,7 +167,7 @@ public abstract class Expr {
 		ArrayList<Expr> exprs;
 
 		public Atom eval(Scope scope) throws Exception {
-			Scope blockScope = scope.deriveNew();
+			Scope blockScope = scope.deriveNew("Block");
 			Atom result = new Atom.Unit();
 			for (Expr expr : exprs) {
 				result = expr.eval(blockScope);
@@ -261,7 +264,7 @@ public abstract class Expr {
 		Expr clause;
 
 		public Atom eval(Scope scope) throws Exception {
-			Scope clausScope = scope.deriveNew();
+			Scope clausScope = scope.deriveNew("Match " + value.toString());
 			clausScope.set(pattern, value.eval(scope));
 			if (constraint == null) {
 				return Atom.MatchCaseResult.matched(clause.eval(clausScope));
@@ -298,9 +301,9 @@ public abstract class Expr {
 		public ArrayList<Expr> body;
 
 		public Atom eval(Scope scope) throws Exception {
-			Scope publicScope = scope.deriveNew();
-			Scope privateScope = publicScope.deriveNew();
-			publicScope.setSharedScope(privateScope); // Add circular dependency back to public scope
+			Scope publicScope = scope.deriveNew("Module " + name + " public");
+			Scope privateScope = publicScope.deriveNew("Module " + name + " private");
+			publicScope.searchChildScopes(true); // Add circular dependency back to public scope
 			for (Expr expr : this.body) {
 				if (expr instanceof Expr.PublicExpr) {
 					expr.eval(publicScope);
@@ -308,6 +311,7 @@ public abstract class Expr {
 					expr.eval(privateScope);
 				}
 			}
+			// publicScope.searchChildScopes(false);
 			scope.set(this.name, new Atom.Module(name, body, publicScope, privateScope));
 			return new Atom.Unit();
 		}
@@ -329,21 +333,23 @@ public abstract class Expr {
 		ArrayList<Expr> variables;
 
 		public Atom eval(Scope scope) throws Exception {
-			Scope evaledScope = scope.deriveNew();
+			Scope evaledScope = scope.deriveNew("LambdaCall " + identifier.toString());
 
 			Atom.Lambda lambda = ((Atom.Lambda) scope.getByIdent(this.identifier));
 			if (lambda != null) {
+				Scope lambdaScope = lambda.getScope();
+				evaledScope.setSharedScope(lambdaScope);
 				return evalLambda(lambda, evaledScope);
 			}
 			if (!(this.identifier instanceof Atom.Ident)) {
-				throw new Exception(
-						"Cannot call built in function '" + identifier.toString() + "', must be single identifier");
+				throw new Exception("[" + scope.getName() + "] Cannot call built in function '" + identifier.toString()
+						+ "', must be single identifier");
 			}
 			String progFuncName = ((Atom.Ident) this.identifier).name;
 			ProgramFunction pf = scope.getProgramFunction(progFuncName);
 			if (pf != null)
 				return evalProgFunc(pf, evaledScope);
-			throw new Exception(String.format("Undefined builtin function '%s'", progFuncName));
+			throw new Exception(String.format("Undefined function '%s'", progFuncName));
 		}
 
 		public Atom evalProgFunc(ProgramFunction pf, Scope evaledScope) throws Exception {

@@ -194,10 +194,16 @@ public abstract class Atom {
 
 	public static class Lambda extends Atom {
 		public HashMap<java.lang.Integer, LambdaVariation> variations;
+		private String name;
+		private Scope scope;
 
-		public Lambda(Expr expr, ArrayList<String> argNames) {
+		public Lambda(String name, Expr expr, ArrayList<String> argNames) {
 			variations = new HashMap<java.lang.Integer, LambdaVariation>();
 			variations.put(argNames.size(), new LambdaVariation(expr, argNames));
+		}
+
+		public Lambda(Expr expr, ArrayList<String> argNames) {
+			this(null, expr, argNames);
 		}
 
 		public void addVariation(Expr expr, ArrayList<String> argNames) {
@@ -207,8 +213,20 @@ public abstract class Atom {
 			variations.put(argNames.size(), new LambdaVariation(expr, argNames));
 		}
 
+		public void setScope(Scope scope) {
+			this.scope = scope;
+		}
+
+		public Scope getScope() {
+			return this.scope;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
 		public String toString() {
-			return String.format("Lambda [\n\t%s\n]",
+			return String.format("Lambda[%s] {\n\t%s\n}", name,
 					String.join(",\n\t", variations.values().stream().map(LambdaVariation::toString).toList()));
 		}
 

@@ -4,16 +4,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Scope {
-	public static int scopeCount = 0;
-	public int scopeId = 0;
-	public Scope parentScope = null;
-	public Scope sharedScope = null;
-	public ArrayList<Scope> childScopes = new ArrayList<Scope>();
+	private static int scopeCount = 0;
+	private int scopeId = 0;
+	private String name;
+	private Scope parentScope = null;
+	private Scope sharedScope = null;
+	private boolean searchChildScopes = false;
+	private ArrayList<Scope> childScopes = new ArrayList<Scope>();
 
 	protected HashMap<String, Atom> environment;
 
-	protected Scope(Scope parentScope) {
+	protected Scope(String name, Scope parentScope) {
 		this.scopeId = scopeCount++;
+		this.name = name;
 		this.parentScope = parentScope;
 		this.environment = new HashMap<String, Atom>();
 	}
@@ -23,19 +26,26 @@ public class Scope {
 	 *
 	 * @return A new child scope.
 	 */
-	public Scope deriveNew() {
-		Scope child = new Scope(this);
+	public Scope deriveNew(String name) {
+		Scope child = new Scope(name, this);
 		childScopes.add(child);
 		return child;
 	}
 
 	/**
 	 * Set a shared scope. Used in modules for sharing public and private variables.
-	 * 
+	 *
 	 * @param sharedScope Scope to be shared.
 	 */
 	public void setSharedScope(Scope sharedScope) {
 		this.sharedScope = sharedScope;
+	}
+
+	/**
+	 * Allows searching child scopes for variables.
+	 */
+	public void searchChildScopes(boolean allowed) {
+		this.searchChildScopes = allowed;
 	}
 
 	/**
@@ -52,7 +62,17 @@ public class Scope {
 			Atom result = sharedScope.get(name);
 			if (result != null) {
 				return result;
-			} // Else try parent scope.
+			}
+			// Else try child scopes.
+		}
+		if (searchChildScopes) {
+			for (Scope child : childScopes) {
+				Atom result = child.get(name);
+				if (result != null) {
+					return result;
+				}
+			}
+			// Else try parent scope.
 		}
 		if (parentScope != null) {
 			return parentScope.get(name);
@@ -147,11 +167,14 @@ public class Scope {
 		childScopes.clear();
 	}
 
+	public String getName() {
+		return this.name;
+	}
+
 	/**
 	 * Format the current scope as text.
 	 */
 	public String toString() {
-		return String.format("Scope { id: %s, env(%s): [\n\t%s\n] }", scopeId, environment.size(), String.join(",\n\t",
-				environment.entrySet().stream().map(e -> String.format("%s: %s", e.getKey(), e.getValue())).toList()));
+		return String.format("Scope[%s] { id: %s, size: %s }", name, scopeId, environment.size());
 	}
 }

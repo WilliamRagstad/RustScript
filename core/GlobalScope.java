@@ -6,7 +6,7 @@ public class GlobalScope extends Scope {
 	private HashMap<String, ProgramFunction> program; // Built in system functions
 
 	public GlobalScope() {
-		super(null);
+		super("Global", null);
 		this.program = new HashMap<String, ProgramFunction>();
 	}
 

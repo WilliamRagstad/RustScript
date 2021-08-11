@@ -180,7 +180,7 @@ public class Parser {
 
 				ArrayList<String> argNames = new ArrayList<>();
 				argNames.add(name);
-				Atom mapLambda = new Atom.Lambda(first, argNames);
+				Atom mapLambda = new Atom.Lambda(name, first, argNames);
 
 				ArrayList<Expr> args = new ArrayList<>(2);
 				args.add(new Expr.AtomicExpr(mapLambda));
@@ -190,7 +190,7 @@ public class Parser {
 
 				if (expect(TokenTy.If)) {
 					Expr cond = exprBP(0);
-					Atom filterLambda = new Atom.Lambda(cond, argNames);
+					Atom filterLambda = new Atom.Lambda(name, cond, argNames);
 
 					ArrayList<Expr> filterArgs = new ArrayList<>(2);
 					filterArgs.add(new Expr.AtomicExpr(filterLambda));
@@ -290,6 +290,9 @@ public class Parser {
 		assertNext(TokenTy.Assign);
 
 		Expr rhs = exprBP(0);
+		if (rhs instanceof Expr.AtomicExpr && ((Expr.AtomicExpr) rhs).val instanceof Atom.Lambda) {
+			((Atom.Lambda) ((Expr.AtomicExpr) rhs).val).setName(ident.lexeme);
+		}
 
 		return new Expr.AssignExpr(ident.lexeme, rhs, nx.index, rhs.endIndex);
 	}
