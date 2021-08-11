@@ -223,7 +223,7 @@ public abstract class Expr {
 		Expr clause;
 
 		public Atom eval(Scope scope) throws Exception {
-			Scope clausScope = scope.clone();
+			Scope clausScope = scope.deriveNew();
 			clausScope.set(pattern, value.eval(scope));
 			if (constraint == null) {
 				return Atom.MatchCaseResult.matched(clause.eval(clausScope));
@@ -259,9 +259,7 @@ public abstract class Expr {
 		ArrayList<Expr> variables;
 
 		public Atom eval(Scope scope) throws Exception {
-			Scope evaledScope = scope.clone();
-			// HashMap<String, Atom> evaledVariables = new HashMap<>();
-			// evaledVariables.putAll(variables);
+			Scope evaledScope = scope.deriveNew();
 
 			Atom.Lambda lambda = ((Atom.Lambda) scope.get(this.name));
 			if (lambda != null)

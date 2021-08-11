@@ -45,34 +45,19 @@ public class Scope {
 	}
 
 	/**
-	 * Clone the current scope.
-	 *
-	 * @param name Name for the new cloned scope.
-	 * @return The cloned scope.
-	 */
-	public Scope clone(String name) {
-		Scope clone = new Scope(name, this.parentScope);
-		clone.environment = new HashMap<String, Atom>(environment);
-		return clone;
-	}
-
-	/**
-	 * Clone the current scope.
-	 *
-	 * @return The cloned scope.
-	 */
-	public Scope clone() {
-		return clone(null);
-	}
-
-	/**
 	 * Get a variable from the current scope or its parent scopes.
 	 *
 	 * @param name The name of the variable to find.
 	 * @return The variable if found, null otherwise.
 	 */
 	public Atom get(String name) {
-		return environment.get(name);
+		if (has(name)) {
+			return environment.get(name);
+		}
+		if (parentScope != null) {
+			return parentScope.get(name);
+		}
+		return null;
 	}
 
 	public void set(String name, Atom value) {
