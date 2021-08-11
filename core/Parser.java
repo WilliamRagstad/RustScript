@@ -5,17 +5,18 @@ import java.util.ArrayList;
 import core.Expr.MatchCaseExpr;
 
 /**
- * @author Mikail Khan <mikail@mikail-khan.com>, William Rågstad <william.ragstad@gmail.com>
+ * @author Mikail Khan <mikail@mikail-khan.com>, William Rågstad
+ *         <william.ragstad@gmail.com>
  *
- *          A Parser takes a String, tokenizes it using a Tokenizer, and then
- *          converts the flat list of tokens into a meaningful Expr AST which
- *          can be evaluated.
+ *         A Parser takes a String, tokenizes it using a Tokenizer, and then
+ *         converts the flat list of tokens into a meaningful Expr AST which can
+ *         be evaluated.
  *
- *          <p>
- *          https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
- *          <br>
- *          I read this article every time I write a parser.
- *          </p>
+ *         <p>
+ *         https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
+ *         <br>
+ *         I read this article every time I write a parser.
+ *         </p>
  *
  */
 public class Parser {
@@ -223,6 +224,11 @@ public class Parser {
 		return parseList(Token.EOF(position, line, column));
 	}
 
+	private Expr parseBlock(Token nx) throws Exception {
+		ArrayList<Expr> exprs = this.exprBPs(0, true, TokenTy.RCurlyBracket);
+		return new Expr.BlockExpr(exprs, nx.index, exprs.get(exprs.size() - 1).endIndex);
+	}
+
 	private ArrayList<Expr> parseCallArgs() throws Exception {
 		assertNext(TokenTy.LParen);
 		ArrayList<Expr> out = new ArrayList<>();
@@ -304,7 +310,8 @@ public class Parser {
 		Expr lhs = switch (nx.ty) {
 			case True -> new Expr.AtomicExpr(new Atom.Bool(true), s, s + nx.lexeme.length());
 			case False -> new Expr.AtomicExpr(new Atom.Bool(false), s, s + nx.lexeme.length());
-			case Integer -> new Expr.AtomicExpr(new Atom.Integer(Integer.parseInt(nx.lexeme)), s, s + nx.lexeme.length());
+			case Integer -> new Expr.AtomicExpr(new Atom.Integer(Integer.parseInt(nx.lexeme)), s,
+					s + nx.lexeme.length());
 			case Float -> new Expr.AtomicExpr(new Atom.Float(Float.parseFloat(nx.lexeme)), s, s + nx.lexeme.length());
 			case Ident -> {
 				if (peek().ty == TokenTy.LParen) {
@@ -330,6 +337,7 @@ public class Parser {
 				expect(TokenTy.RParen);
 				yield temp;
 			}
+			case LCurlyBracket -> parseBlock(nx);
 			case Sub, Caret, Dollar -> {
 				PrefixOp op = switch (nx.ty) {
 					case Sub -> PrefixOp.Negate;
@@ -386,11 +394,17 @@ public class Parser {
 		return lhs;
 	}
 
-	private Expr[] exprBPs(int minBP) throws Exception {
+	private ArrayList<Expr> exprBPs(int minBP) throws Exception {
 		return this.exprBPs(minBP, false);
 	}
 
-	private Expr[] exprBPs(int minBP, boolean allowWhiteSpace) throws Exception {
+	private ArrayList<Expr> exprBPs(int minBP, boolean allowWhiteSpace) throws Exception {
+		return this.exprBPs(minBP, allowWhiteSpace, null);
+	}
+
+	// Todo: Add delmiter TokenTy parameter to allow for different delmiters than
+	// ';' and '\n'.
+	private ArrayList<Expr> exprBPs(int minBP, boolean allowWhiteSpace, TokenTy closing) throws Exception {
 		ArrayList<Expr> exprs = new ArrayList<>();
 		Token n;
 		while (!isFinished()) {
@@ -403,10 +417,13 @@ public class Parser {
 				throw new Exception(error(n,
 						"Unexpected end of expression! Must have an ending ';' or newline till next expression."));
 			eat(false); // Eat n, the separating '\n' or ';'
+			n = peek(true);
+			if (closing != null && n.ty == closing) {
+				eat(true);
+				break;
+			}
 		}
-		Expr[] ret = new Expr[exprs.size()];
-		ret = exprs.toArray(ret);
-		return ret;
+		return exprs;
 	}
 
 	public static Expr parseExpr(String input) throws Exception {
@@ -416,7 +433,7 @@ public class Parser {
 		return p.exprBP(0, true);
 	}
 
-	public static Expr[] parseExprs(String input) throws Exception {
+	public static ArrayList<Expr> parseExprs(String input) throws Exception {
 		ArrayList<Token> tokens = Tokenizer.tokenize(input);
 		Parser p = new Parser(tokens);
 

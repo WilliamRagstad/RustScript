@@ -6,10 +6,10 @@ import java.util.HashMap;
 import core.formatting.EscapeSequence;
 
 /**
- * @author Mikail Khan <mikail@mikail-khan.com>, William Rågstad <william.ragstad@gmail.com>
+ * @author Mikail Khan <mikail@mikail-khan.com>, William Rågstad
+ *         <william.ragstad@gmail.com>
  *
- *          The Tokenizer takes a String and turns it into a flat list of
- *          Tokens.
+ *         The Tokenizer takes a String and turns it into a flat list of Tokens.
  *
  */
 public class Tokenizer {
@@ -105,8 +105,7 @@ public class Tokenizer {
 					// Break if already is a float or if the next character is not a digit
 					position--; // Put the . character back
 					break;
-				}
-				else {
+				} else {
 					isFloat = true;
 				}
 			}
@@ -181,6 +180,8 @@ public class Tokenizer {
 			case ')' -> addToken(TokenTy.RParen, c);
 			case '[' -> addToken(TokenTy.LBracket, c);
 			case ']' -> addToken(TokenTy.RBracket, c);
+			case '{' -> addToken(TokenTy.LCurlyBracket, c);
+			case '}' -> addToken(TokenTy.RCurlyBracket, c);
 			case '+' -> addToken(TokenTy.Add, c);
 			case '-' -> addToken(TokenTy.Sub, c);
 			case '*' -> addToken(TokenTy.Mul, c);

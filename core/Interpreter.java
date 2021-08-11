@@ -165,8 +165,6 @@ public class Interpreter {
 		execute("let sum = fn(ls) => fold(fn (a, b) => a + b, 0, ls)");
 		execute("let product = fn(ls) => fold(fn (a, b) => a * b, 1, ls)");
 		execute("let reverse = fn(ls) => fold(fn (rs, el) => [el] + rs, [], ls)");
-		execute("let seq = fn(ls) => ^reverse(ls)"); // Return the last element of the list, which is evaluated from
-		// first to last.
 		execute("let has = fn(val) => typeof(val) != \"Unit\"");
 	}
 
@@ -206,11 +204,11 @@ public class Interpreter {
 	 * @throws Exception
 	 */
 	public Atom[] evalAll(String program) throws Exception {
-		Expr[] exprs = Parser.parseExprs(program); // Use both ; and \n to separate expressions, todo: Rigorous
+		ArrayList<Expr> exprs = Parser.parseExprs(program); // Use both ; and \n to separate expressions, todo: Rigorous
 		// implementation
 		ArrayList<Atom> results = new ArrayList<>();
-		for (int i = 0; i < exprs.length; i++) {
-			results.add(exprs[i].eval(globalScope));
+		for (int i = 0; i < exprs.size(); i++) {
+			results.add(exprs.get(i).eval(globalScope));
 		}
 		Atom[] ret = new Atom[results.size()];
 		ret = results.toArray(ret);

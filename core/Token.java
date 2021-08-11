@@ -1,14 +1,15 @@
 package core;
 
 /**
- * @author Mikail Khan <mikail@mikail-khan.com>, William Rågstad <william.ragstad@gmail.com>
+ * @author Mikail Khan <mikail@mikail-khan.com>, William Rågstad
+ *         <william.ragstad@gmail.com>
  *
- *          A token
+ *         A token
  *
- *          <p>
- *          A token represents a basic building block of the flat structure of
- *          the language. They're easier to work with than characters.
- *          </p>
+ *         <p>
+ *         A token represents a basic building block of the flat structure of
+ *         the language. They're easier to work with than characters.
+ *         </p>
  */
 public class Token {
 	TokenTy ty;
@@ -40,9 +41,7 @@ public class Token {
 }
 
 enum TokenTy {
-	LParen, RParen,
-
-	LBracket, RBracket,
+	LParen, RParen, LBracket, RBracket, LCurlyBracket, RCurlyBracket,
 
 	Ident, Integer, Float, Character, String, True, False,
 

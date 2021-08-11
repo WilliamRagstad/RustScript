@@ -153,6 +153,33 @@ public abstract class Expr {
 		}
 	}
 
+	public static class BlockExpr extends Expr {
+		ArrayList<Expr> exprs;
+
+		public Atom eval(Scope scope) throws Exception {
+			Scope blockScope = scope.deriveNew();
+			Atom result = new Atom.Unit();
+			for (Expr expr : exprs) {
+				result = expr.eval(blockScope);
+			}
+			return result;
+		}
+
+		public BlockExpr(ArrayList<Expr> exprs, int startIndex, int endIndex) {
+			super(startIndex, endIndex);
+			this.exprs = exprs;
+		}
+
+		public BlockExpr(ArrayList<Expr> exprs) {
+			super(-1, -1);
+			this.exprs = exprs;
+		}
+
+		public String toString() {
+			return String.format("{\n\t%s\n}", String.join(";\n\t", exprs.stream().map(Expr::toString).toList()));
+		}
+	}
+
 	public static class IfExpr extends Expr {
 		Expr cond;
 		Expr lhs;
