@@ -43,7 +43,9 @@ java -jar rsc.jar hello.rs
 
 ### 🔨 Build
 
-If you want to build RustScript on your own. Install the **WiX Toolset** (`dist/tools/wix311.exe`) and run the `build` command from the root directory to build the `Cli.java` class into the standalone executables to `dist/bin/`.
+If you want to build RustScript on your own. Install the **WiX Toolset** (`dist/tools/wix311.exe`) and run the `build.bat` script from the root directory to build the `Cli.java` class into the standalone executables to `dist/bin/`.
+
+You can also simply compile the class files by running the `compile.bat` script from the root directory, and run any module using `java Repl` for example.
 
 ---
 
