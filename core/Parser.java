@@ -266,7 +266,6 @@ public class Parser {
 		 * while (peek().ty != TokenTy.RCurlyBracket) { exprs.add(exprBP(0)); } Token t
 		 * = peek(); assertNext(TokenTy.RCurlyBracket);
 		 */
-		assertNext(TokenTy.LCurlyBracket);
 		ArrayList<Expr> exprs = exprBPs(0, true, TokenTy.RCurlyBracket);
 		Token blockEnd = peek();
 		assertNext(TokenTy.RCurlyBracket);
