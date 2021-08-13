@@ -53,7 +53,7 @@ You can also simply compile the class files by running the `compile.bat` script 
 
 Learn more about the RustScript language by visiting the links below! A good tip is to download the `rsc` CLI tool and start playing around with the examples yourself!
 
-* #### [Language examples](doc/EXAMPLES.md)
+* #### [Code examples](doc/EXAMPLES.md)
 
 * #### [Project euler solutions](doc/PROJECT_EULER.md)
 
