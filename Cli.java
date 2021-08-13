@@ -4,11 +4,11 @@ import java.util.Arrays;
 /**
  * @author William Rågstad <william.ragstad@gmail.com>
  *
- *          The CLI is a simple command line interface for the RustScript
- *          language. It provides a simple way to run RustScript script files
- *          and interact in a playful way using the REPL mode. Sometime in the
- *          future, this might be extended to include a compiler to other
- *          languages like JavaScript, C++ or Python.
+ *         The CLI is a simple command line interface for the RustScript
+ *         language. It provides a simple way to run RustScript script files and
+ *         interact in a playful way using the REPL mode. Sometime in the
+ *         future, this might be extended to include a compiler to other
+ *         languages like JavaScript, C++ or Python.
  */
 public class Cli {
 	private static final String VERSION = "2.2.0";
@@ -38,11 +38,9 @@ public class Cli {
 			%s""", VERSION, DESCRIPTION, COPYRIGHT);
 
 	public static void main(String[] args) {
-		List<String> options = Arrays.asList(args).stream()
-			.filter(arg -> arg.startsWith("-"))
-			.map(String::toLowerCase).toList();
-		List<String> files = Arrays.asList(args).stream()
-			.filter(arg -> !arg.startsWith("-")).toList();
+		List<String> options = Arrays.asList(args).stream().filter(arg -> arg.startsWith("-")).map(String::toLowerCase)
+				.toList();
+		List<String> files = Arrays.asList(args).stream().filter(arg -> !arg.startsWith("-")).toList();
 		if (options.contains("--help") || options.contains("-h")) {
 			System.out.println(HELP);
 		} else if (options.contains("--version") || options.contains("-v")) {
