@@ -11,7 +11,7 @@ import java.util.Arrays;
  *         languages like JavaScript, C++ or Python.
  */
 public class Cli {
-	private static final String VERSION = "2.2.0";
+	private static final String VERSION = "2.3.0";
 	private static final String DESCRIPTION = "A command line interface tool for the RustScript language.";
 	private static final String COPYRIGHT = "Copyright (c) 2021 William Ragstad";
 	private static final String HELP = String.format("""
