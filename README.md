@@ -59,6 +59,21 @@ Learn more about the RustScript language by visiting the links below! A good tip
 
 
 
+## REPL
+
+Start the interactive REPL command tool by running `rsc -r`  or `rsc --repl`. Once started, a little `> ` will appear prompting for an expression to evaluate. You can run anything here as long as it is kept on one line. Expression can be easily separated by semi-colons `;`, and their result will be displayed belowed.
+
+There are also a set of custom commands used when moving around in the local file system. This is done to make it easier to navigate to files that you want to import variables from into your session.
+
+### Commands
+
+| Command | Arguments | Description                           |
+| ------- | --------- | ------------------------------------- |
+| pwd     |           | Display the current working directory |
+| cd      | [path]    | Change current working directory      |
+
+  
+
 ## Community
 The RustScript language is developed by a group of volunteers. To further support the project, we welcome any and all **feedback**, **contributions** and **engagement**!
 
