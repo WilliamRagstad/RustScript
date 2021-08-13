@@ -134,7 +134,40 @@ match parseVal(text)
 	| _ then println("Could not parse input number!")
 ```
 
+### Modules
 
+```rust
+mod Math {
+	pub let PI = 3.1415;
+}
+
+println("Pi is:", Math.PI); // Pi is: 3.1415
+```
+
+### Imports/Exports
+`file1.rs`:
+```rust
+let priv_add = fn(a, b) => a + b;
+let priv_sub = fn(a, b) => a - b;
+let priv_mul = fn(a, b) => a * b;
+let priv_div = fn(a, b) => a / b;
+
+pub let mod = fn(a, b) => floor((a/(b*1.0)-floor(a/(b*1.0)))*b);
+
+pub mod Calc {
+	pub let add = priv_add;
+	pub let sub = priv_sub;
+	pub let mul = priv_mul;
+	pub let div = priv_div;
+}
+```
+`file2.rs`:
+```rust
+imp mod, Calc from "file1.rs"
+
+mod(5, 3) // 2
+Calc.sub(6, 1) // 5
+```
 
 ### Small Standard Library
 
