@@ -154,7 +154,7 @@ let priv_sub = fn(a, b) => a - b;
 let priv_mul = fn(a, b) => a * b;
 let priv_div = fn(a, b) => a / b;
 
-pub let mod = fn(a, b) => floor((a/(b*1.0)-floor(a/(b*1.0)))*b);
+pub let modulus = fn(a, b) => floor((a/(b*1.0)-floor(a/(b*1.0)))*b);
 
 pub mod Calc {
 	pub let add = priv_add;
@@ -165,9 +165,9 @@ pub mod Calc {
 ```
 `file2.rs`:
 ```rust
-imp mod, Calc from "file1.rs"
+imp modulus, Calc from "file1.rs"
 
-mod(5, 3) // 2
+modulus(5, 3) // 2
 Calc.sub(6, 1) // 5
 ```
 
