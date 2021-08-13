@@ -92,6 +92,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
 
+[![](https://sourcerer.io/fame/WilliamRagstad/WilliamRagstad/RustScript/images/0)](https://sourcerer.io/fame/WilliamRagstad/WilliamRagstad/RustScript/links/0)[![](https://sourcerer.io/fame/WilliamRagstad/WilliamRagstad/RustScript/images/1)](https://sourcerer.io/fame/WilliamRagstad/WilliamRagstad/RustScript/links/1)[![](https://sourcerer.io/fame/WilliamRagstad/WilliamRagstad/RustScript/images/2)](https://sourcerer.io/fame/WilliamRagstad/WilliamRagstad/RustScript/links/2)[![](https://sourcerer.io/fame/WilliamRagstad/WilliamRagstad/RustScript/images/3)](https://sourcerer.io/fame/WilliamRagstad/WilliamRagstad/RustScript/links/3)[![](https://sourcerer.io/fame/WilliamRagstad/WilliamRagstad/RustScript/images/4)](https://sourcerer.io/fame/WilliamRagstad/WilliamRagstad/RustScript/links/4)[![](https://sourcerer.io/fame/WilliamRagstad/WilliamRagstad/RustScript/images/5)](https://sourcerer.io/fame/WilliamRagstad/WilliamRagstad/RustScript/links/5)[![](https://sourcerer.io/fame/WilliamRagstad/WilliamRagstad/RustScript/images/6)](https://sourcerer.io/fame/WilliamRagstad/WilliamRagstad/RustScript/links/6)[![](https://sourcerer.io/fame/WilliamRagstad/WilliamRagstad/RustScript/images/7)](https://sourcerer.io/fame/WilliamRagstad/WilliamRagstad/RustScript/links/7)
 
 
 ## Logo Credits
