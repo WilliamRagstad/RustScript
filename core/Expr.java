@@ -526,7 +526,7 @@ public abstract class Expr {
 					((GlobalScope) scope).export(name, result);
 				} // Else just return the result
 			}
-			return result;
+			return new Atom.UnitBox(result);
 		}
 
 		public PublicExpr(Expr expr, int startIndex, int endIndex) {
