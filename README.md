@@ -67,10 +67,11 @@ There are also a set of custom commands used when moving around in the local fil
 
 ### Commands
 
-| Command | Arguments | Description                           |
-| ------- | --------- | ------------------------------------- |
-| pwd     |           | Display the current working directory |
-| cd      | [path]    | Change current working directory      |
+| Command | Arguments | Description                                     |
+| ------- | --------- | ----------------------------------------------- |
+| pwd     |           | Display the current working directory           |
+| ls      |           | List all files in the current working directory |
+| cd      | [path]    | Change current working directory                |
 
   
 

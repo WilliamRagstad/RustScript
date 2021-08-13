@@ -1,16 +1,18 @@
 import java.util.Scanner;
+import java.util.Stack;
 import java.util.function.Consumer;
-
-import core.Interpreter;
+import java.util.function.Supplier;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.NoSuchElementException;
+
+import core.Interpreter;
 
 /**
  * @author Mikail Khan <mikail@mikail-khan.com>, William Rågstad
@@ -26,10 +28,11 @@ public class Repl {
 	}
 
 	private static String currentDirectory;
+
 	private static HashMap<String, Consumer<String[]>> commands = new HashMap<String, Consumer<String[]>>() {
 		{
 			put("pwd", (args) -> {
-				System.out.println(currentDirectory);
+				System.out.println("pwd: " + currentDirectory);
 			});
 			put("cd", (args) -> {
 				if (args.length > 1) {
@@ -45,11 +48,39 @@ public class Repl {
 					System.out.println("cd: missing operand");
 				}
 			});
+			put("ls", (args) -> {
+				if (args.length > 0) {
+					System.out.println("ls: no arguments expected");
+				} else {
+					File currentFile = new File(currentDirectory);
+					Stack<String> files = new Stack<String>();
+					Supplier<String> file = () -> {
+						if (files.isEmpty())
+							return "";
+						String f = files.pop();
+						return f == null ? "" : f;
+					};
+					for (File f : currentFile.listFiles()) {
+						if (f.isDirectory()) {
+							files.push(f.getName() + "/");
+						} else {
+							files.push(f.getName());
+						}
+						if (files.size() >= 3) {
+							System.out.printf("%-22s%-22s%-22s\n", file.get(), file.get(), file.get());
+						}
+					}
+					if (!files.isEmpty()) {
+						// Push the last three files off the stack
+						System.out.printf("%-22s%-22s%-22s\n", file.get(), file.get(), file.get());
+					}
+				}
+			});
 		}
 	};
 
 	private static boolean tryRunCommand(String expr) {
-		ArrayList<String> args = new ArrayList<>(Arrays.asList(expr.split(" ")));
+		ArrayList<String> args = new ArrayList<>(Arrays.asList(expr.trim().split(" ")));
 		String command = args.remove(0);
 		if (commands.containsKey(command)) {
 			commands.get(command).accept(args.toArray(new String[args.size()]));
