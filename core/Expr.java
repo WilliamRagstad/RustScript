@@ -301,18 +301,19 @@ public abstract class Expr {
 		public ArrayList<Expr> body;
 
 		public Atom eval(Scope scope) throws Exception {
-			Scope publicScope = scope.deriveNew("Module " + name + " public");
-			Scope privateScope = publicScope.deriveNew("Module " + name + " private");
-			publicScope.searchChildScopes(true); // Add circular dependency back to public scope
+			ModuleScope moduleScope = new ModuleScope(name, scope);
+			// publicScope.searchChildScopes(true); // Add circular dependency
 			for (Expr expr : this.body) {
 				if (expr instanceof Expr.PublicExpr) {
-					expr.eval(publicScope);
+					moduleScope.setToPrivateEnv(false);
+					expr.eval(moduleScope);
 				} else {
-					expr.eval(privateScope);
+					moduleScope.setToPrivateEnv(true);
+					expr.eval(moduleScope);
 				}
 			}
 			// publicScope.searchChildScopes(false);
-			scope.set(this.name, new Atom.Module(name, body, publicScope, privateScope));
+			scope.set(this.name, new Atom.Module(name, body, moduleScope));
 			return new Atom.Unit();
 		}
 
@@ -333,23 +334,24 @@ public abstract class Expr {
 		ArrayList<Expr> variables;
 
 		public Atom eval(Scope scope) throws Exception {
-			Scope evaledScope = scope.deriveNew("LambdaCall " + identifier.toString());
+			Scope callScope;
 
-			Atom.Lambda lambda = ((Atom.Lambda) scope.getByIdent(this.identifier));
+			Atom.Lambda lambda = ((Atom.Lambda) scope.getByIdent(this.identifier, scope.getID()));
 			if (lambda != null) {
 				Scope lambdaScope = lambda.getScope();
-				evaledScope.setSharedScope(lambdaScope);
-				return evalLambda(lambda, evaledScope);
+				callScope = lambdaScope.deriveNew("Lambda call " + identifier.toString());
+				return evalLambda(lambda, scope, callScope);
 			}
-			if (!(this.identifier instanceof Atom.Ident)) {
-				throw new Exception("[" + scope.getName() + "] Cannot call built in function '" + identifier.toString()
-						+ "', must be single identifier");
+			if (this.identifier instanceof Atom.Ident) {
+				String progFuncName = ((Atom.Ident) this.identifier).name;
+				ProgramFunction pf = scope.getProgramFunction(progFuncName);
+				callScope = scope.deriveNew("Builtin call " + progFuncName);
+				if (pf != null) {
+					return evalProgFunc(pf, callScope);
+				}
 			}
-			String progFuncName = ((Atom.Ident) this.identifier).name;
-			ProgramFunction pf = scope.getProgramFunction(progFuncName);
-			if (pf != null)
-				return evalProgFunc(pf, evaledScope);
-			throw new Exception(String.format("Undefined function '%s'", progFuncName));
+			throw new Exception(
+					String.format("Undefined function '%s' in %s", this.identifier.toString(), scope.getName()));
 		}
 
 		public Atom evalProgFunc(ProgramFunction pf, Scope evaledScope) throws Exception {
@@ -360,7 +362,7 @@ public abstract class Expr {
 			return pf.call(args);
 		}
 
-		public Atom evalLambda(Atom.Lambda lambda, Scope evaledScope) throws Exception {
+		public Atom evalLambda(Atom.Lambda lambda, Scope lambdaScope, Scope callScope) throws Exception {
 			for (Map.Entry<java.lang.Integer, LambdaVariation> lambdaVariation : lambda.variations.entrySet()) {
 				int arity = lambdaVariation.getKey();
 
@@ -368,9 +370,9 @@ public abstract class Expr {
 					LambdaVariation variation = lambdaVariation.getValue();
 					ArrayList<String> argNames = variation.argNames;
 					for (int i = 0; i < argNames.size(); i += 1) {
-						evaledScope.set(argNames.get(i), this.variables.get(i).eval(evaledScope));
+						callScope.set(argNames.get(i), this.variables.get(i).eval(lambdaScope));
 					}
-					return variation.expr.eval(evaledScope);
+					return variation.expr.eval(callScope);
 				}
 			}
 			throw new Exception(String.format("Could not find function variation matching %s/%s.",
@@ -435,7 +437,7 @@ public abstract class Expr {
 			if (variationValue instanceof Atom.Lambda) {
 				if (scope.has(lhs)) {
 					// Add the new variation
-					Atom lambda = scope.get(lhs);
+					Atom lambda = scope.get(lhs, scope.getID());
 					if (lambda instanceof Atom.Lambda) {
 						LambdaVariation lambdaVariation = ((Atom.Lambda) variationValue).variations.values().iterator()
 								.next();

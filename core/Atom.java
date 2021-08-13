@@ -170,25 +170,22 @@ public abstract class Atom {
 	}
 
 	public static class Module extends Atom {
-		public String name;
-		public ArrayList<Expr> body;
-		private Scope publicScope;
-		private Scope privateScope;
+		private String name;
+		private ArrayList<Expr> body;
+		private ModuleScope moduleScope;
 
-		public Module(String name, ArrayList<Expr> body, Scope publicScope, Scope privateScope) throws Exception {
+		public Module(String name, ArrayList<Expr> body, ModuleScope moduleScope) throws Exception {
 			this.name = name;
-			this.publicScope = publicScope;
-			this.privateScope = privateScope;
+			this.moduleScope = moduleScope;
 			this.body = body;
 		}
 
-		public Scope getPublicScope() {
-			return publicScope;
+		public ModuleScope getModuleScope() {
+			return moduleScope;
 		}
 
 		public String toString() {
-			return String.format("Module { name: %s, public: %s, private: %s }", name, publicScope.toString(),
-					privateScope.toString());
+			return String.format("Module[%s] { scope: %s }", name, moduleScope.toString());
 		}
 	}
 

@@ -7,18 +7,23 @@
 // requires the module name as prefix.
 
 
-let square = fn(x) => Math.mul(x, x); // Not accessible from outside this file.
+let square = fn(x) => x * x; // square is not accessible from outside this file.
+let breakMul = fn() => Math.mul(1, 1);
 
 mod Math {
-	pub let PI = 3.1415;
+	pub let PI = 3.14159265359;
+	pub let E  = 2.71828182846;
 	pub let TAU = 2 * PI;
-	pub let E = 2.7183;
 	pub let EPSILON = 0.000001;
 
 	let mul = fn(x, y) => x * y; // Not accessible from outside this module.
-	pub let cube = fn(x) => Math.mul(square(x), x);
+	pub let cube = fn(x) => mul(square(x), x); // Can access mul from withing the same module (or nested module).
 }
 
+println("square 2:", square(2));
 println("Pi is:", Math.PI);
 println("Pi cubed is:", Math.cube(Math.PI));
-println("Pi multiplied by 10 is:", Math.mul(Math.PI, 10)); // Should fail as mul is private.
+
+// These two should fail as mul is private.
+println("breakMul: ", breakMul());
+println("Pi * 10 is:", Math.mul(Math.PI, 10));

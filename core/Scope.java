@@ -5,11 +5,9 @@ import java.util.HashMap;
 
 public class Scope {
 	private static int scopeCount = 0;
-	private int scopeId = 0;
-	private String name;
-	private Scope parentScope = null;
-	private Scope sharedScope = null;
-	private boolean searchChildScopes = false;
+	protected int scopeId = 0;
+	protected String name;
+	protected Scope parentScope = null;
 	private ArrayList<Scope> childScopes = new ArrayList<Scope>();
 
 	protected HashMap<String, Atom> environment;
@@ -19,6 +17,10 @@ public class Scope {
 		this.name = name;
 		this.parentScope = parentScope;
 		this.environment = new HashMap<String, Atom>();
+
+		if (this.parentScope != null) {
+			this.parentScope.childScopes.add(this);
+		}
 	}
 
 	/**
@@ -27,26 +29,23 @@ public class Scope {
 	 * @return A new child scope.
 	 */
 	public Scope deriveNew(String name) {
-		Scope child = new Scope(name, this);
-		childScopes.add(child);
-		return child;
+		return new Scope(name, this);
 	}
 
-	/**
-	 * Set a shared scope. Used in modules for sharing public and private variables.
-	 *
-	 * @param sharedScope Scope to be shared.
-	 */
-	public void setSharedScope(Scope sharedScope) {
-		this.sharedScope = sharedScope;
+	public void addEnv(HashMap<String, Atom> env) {
+		this.environment.putAll(env);
+	}
+
+	public HashMap<String, Atom> getEnv() {
+		return this.environment;
 	}
 
 	/**
 	 * Allows searching child scopes for variables.
 	 */
-	public void searchChildScopes(boolean allowed) {
-		this.searchChildScopes = allowed;
-	}
+	// public void searchChildScopes(boolean allowed) {
+	// this.searchChildScopes = allowed;
+	// }
 
 	/**
 	 * Get a variable from the current scope or its parent scopes.
@@ -54,30 +53,28 @@ public class Scope {
 	 * @param name The name of the variable to find.
 	 * @return The variable if found, null otherwise.
 	 */
-	public Atom get(String name) {
+	public Atom get(String name, int sourceScopeId, boolean callFromChild) {
 		if (environment.containsKey(name)) {
 			return environment.get(name);
 		}
-		if (sharedScope != null) {
-			Atom result = sharedScope.get(name);
-			if (result != null) {
-				return result;
-			}
-			// Else try child scopes.
-		}
-		if (searchChildScopes) {
-			for (Scope child : childScopes) {
-				Atom result = child.get(name);
-				if (result != null) {
-					return result;
-				}
-			}
-			// Else try parent scope.
-		}
 		if (parentScope != null) {
-			return parentScope.get(name);
+			return parentScope.get(name, sourceScopeId, true);
 		}
 		return null;
+	}
+
+	public Atom get(String name, int sourceScopeId) {
+		return get(name, sourceScopeId, false);
+	}
+
+	/**
+	 * Assume the get method is called on the current scope.
+	 *
+	 * @param name
+	 * @return
+	 */
+	public Atom get(String name) {
+		return get(name, scopeId);
 	}
 
 	/**
@@ -88,14 +85,18 @@ public class Scope {
 	 * @return The variable if found, null otherwise.
 	 * @throws Exception If the identifier is not an Atom.Ident or Atom.IdentList.
 	 */
-	public Atom getByIdent(Atom identifier) throws Exception {
+	public Atom getByIdent(Atom identifier, int sourceScopeId) throws Exception {
 		if (identifier instanceof Atom.Ident) {
-			return get(((Atom.Ident) identifier).name);
+			return get(((Atom.Ident) identifier).name, sourceScopeId);
 		} else if (identifier instanceof Atom.IdentList) {
-			return find(((Atom.IdentList) identifier).getIdentifiers());
+			return find(((Atom.IdentList) identifier).getIdentifiers(), sourceScopeId);
 		} else {
 			throw new RuntimeException("Cannot get variable using non Ident or IdentList identifier atom argument");
 		}
+	}
+
+	public Atom getByIdent(Atom identifier) throws Exception {
+		return getByIdent(identifier, scopeId);
 	}
 
 	/**
@@ -116,7 +117,7 @@ public class Scope {
 	 * @return The variable if found, null otherwise.
 	 * @throws Exception If the module path cannot be followed.
 	 */
-	public Atom find(String[] identifierNames) throws Exception {
+	public Atom find(String[] identifierNames, int sourceScopeId) throws Exception {
 		Scope scopePath = this; // Temporary scope to follow the identifier names path to the deepest module.
 		Atom module = null;
 		if (identifierNames.length == 0) {
@@ -125,17 +126,21 @@ public class Scope {
 		String deepestIdentifier = identifierNames[identifierNames.length - 1];
 		for (int i = 0; i < identifierNames.length - 1; i++) {
 			String name = identifierNames[i];
-			module = scopePath.get(name);
+			module = scopePath.get(name, sourceScopeId);
 			if (module == null) {
 				throw new Exception(String.format("Tried to access nonexistent module %s", name));
 			} else if (module instanceof Atom.Module) {
-				scopePath = ((Atom.Module) module).getPublicScope();
+				scopePath = ((Atom.Module) module).getModuleScope();
 			} else {
 				throw new Exception(String.format("Tried to access property on non-module %s", name));
 			}
 		}
 
-		return scopePath.get(deepestIdentifier);
+		return scopePath.get(deepestIdentifier, sourceScopeId);
+	}
+
+	public Atom find(String[] identifierNames) throws Exception {
+		return find(identifierNames, scopeId);
 	}
 
 	/**
@@ -167,8 +172,16 @@ public class Scope {
 		childScopes.clear();
 	}
 
+	public int getID() {
+		return this.scopeId;
+	}
+
 	public String getName() {
 		return this.name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**
