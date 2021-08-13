@@ -79,6 +79,24 @@ let capC = 'C'
 // [0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144, 169, 196]
 ```
 
+### Code Blocks
+
+```rust
+let blockFn = fn(x) => {
+	let y = 2;
+	let z = 3;
+	x + y + z;
+}
+
+blockFn(5); // 10
+
+{
+	let a = 12; // Block scoped
+}
+a; // Tried to add variation to nonexistent variable a
+
+```
+
 ### Lambdas
 
 ```rust
