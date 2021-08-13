@@ -129,6 +129,27 @@ public class Parser {
 		return new Expr.ModuleExpr(name.toString(), block.getExprs(), nx.index, block.endIndex);
 	}
 
+	private Expr parseImportExpr(Token nx) throws Exception {
+		if (peek().ty != TokenTy.Ident) {
+			throw new Exception(error(peek(), "Expected import list, got " + peek().toString()));
+		}
+		ArrayList<Expr> importListExpr = exprBPs(0, true, TokenTy.ImportFrom);
+		ArrayList<String> importList = new ArrayList<>();
+		for (Expr e : importListExpr) {
+			if (!(e instanceof Expr.AtomicExpr && ((Expr.AtomicExpr) e).val instanceof Atom.Ident)) {
+				throw new Exception(error(nx, "Expected import identifier name, got " + e.toString()));
+			}
+			importList.add(((Atom.Ident) ((Expr.AtomicExpr) e).val).name);
+		}
+		assertNext(TokenTy.ImportFrom);
+		Expr fileNameExpr = exprBP(0);
+		if (!(fileNameExpr instanceof Expr.AtomicExpr && ((Expr.AtomicExpr) fileNameExpr).val instanceof Atom.Str)) {
+			throw new Exception(error(nx, "Expected import string filepath, got " + fileNameExpr.toString()));
+		}
+		String fileName = ((Atom.Str) ((Expr.AtomicExpr) fileNameExpr).val).getStringValue(false);
+		return new Expr.ImportExpr(importList, fileName, nx.index, fileNameExpr.endIndex);
+	}
+
 	private Expr parseMatchExpr(Token nx) throws Exception {
 		Expr value = exprBP(0);
 		ArrayList<MatchCaseExpr> cases = new ArrayList<>();
@@ -390,6 +411,7 @@ public class Parser {
 			case Fn -> parseLambdaExpr(nx);
 			case If -> parseIfExpr(nx);
 			case Module -> parseModuleExpr(nx);
+			case Import -> parseImportExpr(nx);
 			case Match -> parseMatchExpr(nx);
 			case LBracket -> parseList(nx);
 			case LParen -> {
@@ -476,8 +498,8 @@ public class Parser {
 			if (n.ty == TokenTy.EOF || (closing != null && n.ty == closing))
 				break;
 			if (!(n.ty == TokenTy.SColon || n.ty == TokenTy.NL))
-				throw new Exception(error(n,
-						"Unexpected end of expression! Must have an ending ';' or newline till next expression."));
+				throw new Exception(
+						error(n, "Unexpected token " + n.toString() + "! Expressions must end with ';' or newline"));
 			s = eat(false); // Eat n, the separating '\n' or ';'
 		}
 		return exprs;

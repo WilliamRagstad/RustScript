@@ -99,14 +99,20 @@ public class Scope {
 		return getByIdent(identifier, scopeId);
 	}
 
+	public String getSourceFileDirectory() {
+		return parentScope != null ? parentScope.getSourceFileDirectory() : null;
+	}
+
 	/**
 	 * Set a variable in the current scope.
 	 *
 	 * @param name  Name of the variable.
 	 * @param value Value of the variable.
+	 * @return The saved value of the variable.
 	 */
-	public void set(String name, Atom value) {
+	public Atom set(String name, Atom value) {
 		environment.put(name, value);
+		return value;
 	}
 
 	/**

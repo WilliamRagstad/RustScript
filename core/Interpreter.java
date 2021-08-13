@@ -184,6 +184,10 @@ public class Interpreter {
 		}
 	}
 
+	public GlobalScope getGlobalScope() {
+		return globalScope;
+	}
+
 	public Atom eval(String expr) throws Exception {
 		return Parser.parseExpr(expr).eval(globalScope);
 	}
@@ -203,9 +207,10 @@ public class Interpreter {
 	 * @param exprs Expressions to evaluate
 	 * @throws Exception
 	 */
-	public Atom[] evalAll(String program) throws Exception {
+	public Atom[] evalAll(String program, String sourceFileDirectoryPath) throws Exception {
 		ArrayList<Expr> exprs = Parser.parseExprs(program); // Use both ; and \n to separate expressions, todo: Rigorous
 		// implementation
+		globalScope.setSourceFileDirectory(sourceFileDirectoryPath);
 		ArrayList<Atom> results = new ArrayList<>();
 		for (int i = 0; i < exprs.size(); i++) {
 			results.add(exprs.get(i).eval(globalScope));
@@ -215,8 +220,8 @@ public class Interpreter {
 		return ret;
 	}
 
-	public void executeAll(String program) throws Exception {
-		Atom[] res = evalAll(program);
+	public void executeAll(String program, String sourceFileDirectoryPath) throws Exception {
+		Atom[] res = evalAll(program, sourceFileDirectoryPath);
 		if (res.length == 0)
 			return;
 		Atom lst = res[res.length - 1];

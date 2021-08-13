@@ -51,7 +51,7 @@ enum TokenTy {
 
 	And, Or,
 
-	If, Then, Else, Match, MatchCase, MatchCaseCond,
+	If, Then, Else, Match, MatchCase, MatchCaseCond, Import, ImportFrom,
 
 	Let, Assign, Variation, Comma, Module, Pub,
 

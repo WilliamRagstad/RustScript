@@ -278,6 +278,18 @@ public abstract class Atom {
 		}
 	}
 
+	public static class UnitBox extends Unit {
+		private Atom value;
+
+		public UnitBox(Atom value) {
+			this.value = value;
+		}
+
+		public Atom getValue() {
+			return value;
+		}
+	}
+
 	public Atom add(Atom rhs) throws Exception {
 		if (this instanceof List && !(this instanceof Str) && ((List) this).isCharArray()) {
 			// If a List but classify as Str, convert it

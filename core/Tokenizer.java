@@ -103,6 +103,8 @@ public class Tokenizer {
 			case "and" -> addToken(TokenTy.MatchCaseCond, lexeme);
 			case "mod" -> addToken(TokenTy.Module, lexeme);
 			case "pub" -> addToken(TokenTy.Pub, lexeme);
+			case "imp" -> addToken(TokenTy.Import, lexeme);
+			case "from" -> addToken(TokenTy.ImportFrom, lexeme);
 			default -> {
 				if (lexeme.indexOf('.') > 0) {
 					addToken(TokenTy.IdentList, lexeme);

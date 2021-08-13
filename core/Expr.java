@@ -1,11 +1,16 @@
 package core;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import core.Atom.Lambda.LambdaVariation;
 import core.formatting.EscapeSequence;
+import helper.FileHelper;
 
 /**
  * @author Mikail Khan <mikail@mikail-khan.com>, William Rågstad
@@ -313,8 +318,7 @@ public abstract class Expr {
 				}
 			}
 			// publicScope.searchChildScopes(false);
-			scope.set(this.name, new Atom.Module(name, body, moduleScope));
-			return new Atom.Unit();
+			return new Atom.UnitBox(scope.set(this.name, new Atom.Module(name, body, moduleScope)));
 		}
 
 		public ModuleExpr(String name, ArrayList<Expr> body, int startIndex, int endIndex) {
@@ -326,6 +330,45 @@ public abstract class Expr {
 		public String toString() {
 			return String.format("mod %s {\n\t%s\n}", name,
 					String.join(",\n\t", body.stream().map(Expr::toString).toList()));
+		}
+	}
+
+	public static class ImportExpr extends Expr {
+		ArrayList<String> importList;
+		String fileName;
+
+		public Atom eval(Scope scope) throws Exception {
+			Path currentPath = Paths.get(scope.getSourceFileDirectory());
+			Path filePath1 = Paths.get(fileName);
+			Path filePath2 = currentPath.resolve(fileName);
+			String source = FileHelper.readFile(filePath2);
+			Interpreter i = new Interpreter();
+			String p1 = filePath2.getParent().toString();
+			String p2 = filePath2.getParent().normalize().toAbsolutePath().toString();
+			i.evalAll(source, p2);
+			HashMap<String, Atom> importedExports = i.getGlobalScope().getExports();
+			for (String importName : importList) {
+				if (!importedExports.containsKey(importName)) {
+					throw new Exception("File " + fileName + " does not export " + importName + "!");
+				}
+				// Identifier is exported from the imported file
+				scope.set(importName, importedExports.get(importName));
+			}
+			return new Atom.Unit();
+		}
+
+		public ImportExpr(ArrayList<String> importList, String fileName, int startIndex, int endIndex) {
+			super(startIndex, endIndex);
+			this.importList = importList;
+			this.fileName = fileName;
+		}
+
+		public ImportExpr(ArrayList<String> importList, String fileName) {
+			this(importList, fileName, -1, -1);
+		}
+
+		public String toString() {
+			return String.format("imp %s from \"%s\"", String.join(", ", importList), fileName);
 		}
 	}
 
@@ -407,8 +450,7 @@ public abstract class Expr {
 		Expr rhs;
 
 		public Atom eval(Scope scope) throws Exception {
-			scope.set(lhs, rhs.eval(scope));
-			return new Atom.Unit();
+			return new Atom.UnitBox(scope.set(lhs, rhs.eval(scope)));
 		}
 
 		public AssignExpr(String lhs, Expr rhs, int startIndex, int endIndex) {
@@ -469,7 +511,22 @@ public abstract class Expr {
 		Expr expr;
 
 		public Atom eval(Scope scope) throws Exception {
-			return expr.eval(scope);
+			Atom result = expr.eval(scope);
+			if (result instanceof Atom.UnitBox) {
+				// Unpack the result
+				result = ((Atom.UnitBox) result).getValue();
+			}
+			if (scope instanceof GlobalScope && !(result instanceof Atom.Unit)) {
+				// Supported exported (pub) expressions
+				if (expr instanceof Expr.AssignExpr) {
+					String name = ((Expr.AssignExpr) expr).lhs;
+					((GlobalScope) scope).export(name, result);
+				} else if (expr instanceof Expr.ModuleExpr) {
+					String name = ((Expr.ModuleExpr) expr).name;
+					((GlobalScope) scope).export(name, result);
+				} // Else just return the result
+			}
+			return result;
 		}
 
 		public PublicExpr(Expr expr, int startIndex, int endIndex) {
@@ -478,8 +535,7 @@ public abstract class Expr {
 		}
 
 		public PublicExpr(Expr expr) {
-			super(-1, -1);
-			this.expr = expr;
+			this(expr, -1, -1);
 		}
 
 		public String toString() {

@@ -1,12 +1,11 @@
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
 import core.Interpreter;
+import helper.FileHelper;
 
 /**
  * @author William Rågstad <william.ragstad@gmail.com>
@@ -18,7 +17,7 @@ import core.Interpreter;
  */
 public class Runner {
 	public static void main(String[] args) throws Exception {
-		// args = new String[] { "test\\input8.rs" };
+		// args = new String[] { "test\\input9.2.rs" };
 		if (args.length == 0) {
 			System.out.println("Usage: Runner [file(s)]");
 			return;
@@ -35,26 +34,18 @@ public class Runner {
 			return;
 		}
 		for (String file : files) {
-			File f = new File(file);
-			if (!f.exists()) {
-				System.out.println("File '" + file + "' does not exist.");
-				return;
-			} else if (f.isDirectory()) {
-				System.out.println("File '" + file + "' is a directory.");
-				return;
-			} else if (!f.canRead()) {
-				System.out.println("File '" + file + "' is not readable.");
-				return;
-			}
 			String source;
+			Path filePath = Paths.get(file);
 			try {
-				source = Files.readString(Paths.get(file), StandardCharsets.UTF_8);
+				source = FileHelper.readFile(filePath);
 			} catch (IOException e) {
 				e.printStackTrace();
 				continue;
 			}
 			try {
-				i.evalAll(source); // Discard last the expressions value
+				String p1 = filePath.getParent().toString();
+				String p2 = filePath.getParent().normalize().toAbsolutePath().toString();
+				i.evalAll(source, p2); // Discard last the expressions value
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
 				return;

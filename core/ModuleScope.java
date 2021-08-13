@@ -39,13 +39,15 @@ public class ModuleScope extends Scope {
 	 *
 	 * @param name  Name of the variable.
 	 * @param value Value of the variable.
+	 * @return The unit atom.
 	 */
-	public void set(String name, Atom value) {
+	public Atom set(String name, Atom value) {
 		if (setToPrivateEnv) {
 			privateEnvironment.put(name, value);
 		} else {
 			environment.put(name, value);
 		}
+		return new Atom.Unit();
 	}
 
 	/**
