@@ -138,10 +138,12 @@ match parseVal(text)
 
 ```rust
 mod Math {
-	pub let PI = 3.1415;
+	pub mod Constants {
+		pub let PI = 3.1415;
+	}
 }
 
-println("Pi is:", Math.PI); // Pi is: 3.1415
+println("Pi is:", Math.Constants.PI); // Pi is: 3.1415
 ```
 
 ### Imports/Exports
