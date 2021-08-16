@@ -38,15 +38,15 @@ public class Parser {
 		return peek(true);
 	}
 
-	private Token peek(boolean inExpr) {
-		return peek(inExpr, 0);
+	private Token peek(boolean skipWhiteSpace) {
+		return peek(skipWhiteSpace, 0);
 	}
 
-	private Token peek(boolean inExpr, int offset) {
+	private Token peek(boolean skipWhiteSpace, int offset) {
 		if (isFinished() || position + offset >= tokens.size())
 			return Token.EOF(position, line, column);
 		Token ret = tokens.get(position + offset);
-		if (inExpr && ret.ty == TokenTy.NL)
+		if (skipWhiteSpace && ret.ty == TokenTy.NL)
 			return peek(true, offset + 1);
 		return ret;
 	}
@@ -55,13 +55,13 @@ public class Parser {
 		return eat(true);
 	}
 
-	private Token eat(boolean inExpr) {
+	private Token eat(boolean skipWhiteSpace) {
 		if (!isFinished()) {
 			Token ret = tokens.get(position);
 			position += 1;
 			line = ret.line;
 			column = ret.column;
-			if (inExpr && ret.ty == TokenTy.NL)
+			if (skipWhiteSpace && ret.ty == TokenTy.NL)
 				return eat(true);
 			else
 				return ret;
