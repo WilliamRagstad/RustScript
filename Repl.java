@@ -23,7 +23,6 @@ import core.Interpreter;
  */
 public class Repl {
 	public static void main(String[] args) {
-		currentDirectory = System.getProperty("user.dir");
 		run();
 	}
 
@@ -90,6 +89,7 @@ public class Repl {
 	}
 
 	public static void run() {
+		currentDirectory = System.getProperty("user.dir");
 		Interpreter i;
 		try {
 			i = new Interpreter();
