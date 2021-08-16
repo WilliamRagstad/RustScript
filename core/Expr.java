@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import core.Atom.Lambda.LambdaVariation;
-import core.formatting.EscapeSequence;
-import helper.FileHelper;
+import core.util.EscapeSequence;
+import core.util.FileHelper;
 
 /**
  * @author Mikail Khan <mikail@mikail-khan.com>, William Rågstad

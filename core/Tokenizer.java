@@ -3,7 +3,7 @@ package core;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import core.formatting.EscapeSequence;
+import core.util.EscapeSequence;
 
 /**
  * @author Mikail Khan <mikail@mikail-khan.com>, William Rågstad

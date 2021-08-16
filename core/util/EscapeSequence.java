@@ -1,4 +1,4 @@
-package core.formatting;
+package core.util;
 
 import java.util.HashMap;
 import java.util.Optional;
@@ -71,7 +71,7 @@ public class EscapeSequence {
 		}
 		return result;
     }
-    
+
 	private static boolean isHex(char c) {
 		return Character.isDigit(c) || (c >= 'A' && c <= 'F');
 	}

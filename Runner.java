@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import core.Interpreter;
-import helper.FileHelper;
+import core.util.FileHelper;
 
 /**
  * @author William Rågstad <william.ragstad@gmail.com>

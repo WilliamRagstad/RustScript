@@ -1,2 +1,2 @@
 @echo off
-javac *.java core/*.java core/formatting/*.java
+javac *.java core/*.java core/util/*.java
