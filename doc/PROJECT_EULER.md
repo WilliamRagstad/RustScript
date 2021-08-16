@@ -33,7 +33,7 @@ sum([f for f in fibs if f < 4000000 && f % 2 == 0])
 > The prime factors of 13195 are 5, 7, 13 and 29.
 > What is the largest prime factor of the number 600851475143 ?
 
-```haskell
+```rust
 let find = fn (f, ls) => if (ls) then (if (f(^ls)) then (^ls) else (find(f, $ls))) else (false)
 let factor = fn (n) => find(fn (i) => n % i == 0, [2..n / 2])
 ```
@@ -42,19 +42,19 @@ let factor = fn (n) => find(fn (i) => n % i == 0, [2..n / 2])
 
 It's worth noting that `factor` doubles as `is_prime`, since it returns false for prime numbers.
 
-### Problem 5
+### Problem 4
 
 > 2520 is the smallest number that can be divided by each of the numbers from 1 to 10 without any remainder.
 > What is the smallest positive number that is evenly divisible by all of the numbers from 1 to 20?
 
-```haskell
+```rust
 let gcd = fn (a, b) => if (b == 0)  then (a) else (gcd(b, (a % b)))
 let lcm = fn (a, b) => (a * b) / (gcd(a, b))
 fold(lcm, 1, [1..20])
 // 232792560
 ```
 
-### Problem 6
+### Problem 5
 
 > The sum of the squares of the first ten natural numbers is,
 > 1^2 + 2^2 + ... + 10^2 = 385$$
@@ -65,7 +65,7 @@ fold(lcm, 1, [1..20])
 > Hence the difference between the sum of the squares of the first ten natural numbers and the square of the sum is $3025 - 385 = 2640$.
 > Find the difference between the sum of the squares of the first one hundred natural numbers and the square of the sum.
 
-```haskell
+```rust
 let square = fn (x) => x * x
 square(sum([1..100])) - (sum(fmap(square, [1..100])))
 ```
