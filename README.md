@@ -11,7 +11,7 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/WilliamRagstad/RustScript?style=flat-square)
 ![GitHub downloads all releases](https://img.shields.io/github/downloads/WilliamRagstad/RustScript/total?style=flat-square)
 ![Lines of code](https://img.shields.io/tokei/lines/github/WilliamRagstad/RustScript?label=lines%20of%20code&style=flat-square) <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <br>
@@ -93,11 +93,11 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
-
 <table>
   <tr>
     <td align="center"><a href="https://www.williamragstad.com/"><img src="https://avatars.githubusercontent.com/u/41281398?v=4?s=100" width="100px;" alt=""/><br /><sub><b>William Rågstad</b></sub></a><br /><a href="#maintenance-WilliamRagstad" title="Maintenance">🚧</a> <a href="https://github.com/WilliamRagstad/RustScript/commits?author=WilliamRagstad" title="Tests">⚠️</a> <a href="https://github.com/WilliamRagstad/RustScript/commits?author=WilliamRagstad" title="Code">💻</a> <a href="#design-WilliamRagstad" title="Design">🎨</a></td>
     <td align="center"><a href="https://mikail-khan.com"><img src="https://avatars.githubusercontent.com/u/24574272?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mikail Khan</b></sub></a><br /><a href="https://github.com/WilliamRagstad/RustScript/commits?author=mkhan45" title="Documentation">📖</a> <a href="https://github.com/WilliamRagstad/RustScript/commits?author=mkhan45" title="Tests">⚠️</a> <a href="https://github.com/WilliamRagstad/RustScript/commits?author=mkhan45" title="Code">💻</a></td>
+    <td align="center"><a href="https://twitter.com/mvsamuel"><img src="https://avatars.githubusercontent.com/u/368886?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mike Samuel</b></sub></a><br /><a href="https://github.com/WilliamRagstad/RustScript/commits?author=mikesamuel" title="Documentation">📖</a></td>
   </tr>
 </table>
 
