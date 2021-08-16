@@ -25,7 +25,10 @@ public class Runner {
 		run(Arrays.asList(args));
 	}
 
+	private static String currentDirectory;
+
 	public static void run(List<String> files) {
+		currentDirectory = System.getProperty("user.dir");
 		Interpreter i;
 		try {
 			i = new Interpreter();
@@ -35,7 +38,7 @@ public class Runner {
 		}
 		for (String file : files) {
 			String source;
-			Path filePath = Paths.get(file);
+			Path filePath = Paths.get(currentDirectory).resolve(file);
 			try {
 				source = FileHelper.readFile(filePath);
 			} catch (IOException e) {
@@ -43,7 +46,6 @@ public class Runner {
 				continue;
 			}
 			try {
-				String p1 = filePath.getParent().toString();
 				String p2 = filePath.getParent().normalize().toAbsolutePath().toString();
 				i.evalAll(source, p2); // Discard last the expressions value
 			} catch (Exception e) {

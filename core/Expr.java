@@ -339,11 +339,9 @@ public abstract class Expr {
 
 		public Atom eval(Scope scope) throws Exception {
 			Path currentPath = Paths.get(scope.getSourceFileDirectory());
-			Path filePath1 = Paths.get(fileName);
 			Path filePath2 = currentPath.resolve(fileName);
 			String source = FileHelper.readFile(filePath2);
 			Interpreter i = new Interpreter();
-			String p1 = filePath2.getParent().toString();
 			String p2 = filePath2.getParent().normalize().toAbsolutePath().toString();
 			i.evalAll(source, p2);
 			HashMap<String, Atom> importedExports = i.getGlobalScope().getExports();
