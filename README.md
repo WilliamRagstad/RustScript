@@ -1,3 +1,8 @@
+> # Deprecated
+> View the latest development here: https://github.com/mkhan45/RustScript2
+---
+<br>
+
 <div>
     <h1>
         <img src="assets/logo.png" width="480">
@@ -18,7 +23,7 @@
 
 > ## 📥 Install
 >
-> [Download](https://github.com/WilliamRagstad/RustScript/releases/latest/download/rsc.zip) the latest version of the RustScript CLI tool, or [view all releases](https://github.com/WilliamRagstad/RustScript/releases).
+> [Download](https://github.com/WilliamRagstad/RustScript/releases/latest/download/rsc.zip) the latest version of this version of the RustScript CLI tool, or [view all releases](https://github.com/WilliamRagstad/RustScript/releases).
 
 <br>
 
