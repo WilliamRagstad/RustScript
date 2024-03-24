@@ -12,7 +12,6 @@
     </p>
 </div>
 
-![visitors](https://visitor-badge.glitch.me/badge?page_id=WilliamRagstad.RustScript)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/WilliamRagstad/RustScript?style=flat-square)
 ![GitHub downloads all releases](https://img.shields.io/github/downloads/WilliamRagstad/RustScript/total?style=flat-square)
 ![Lines of code](https://img.shields.io/tokei/lines/github/WilliamRagstad/RustScript?label=lines%20of%20code&style=flat-square) <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
